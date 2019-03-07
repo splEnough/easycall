@@ -45,5 +45,34 @@ public class RpcProtocol {
      */
     private byte[] serviceName;
 
+    /**
+     * 方法名
+     */
+    private byte[] methodName;
+
+    /**
+     * 单个参数的信息
+     */
+    private class ParamTypeAndValue{
+        /**
+         * 参数类型长度
+         */
+        private byte paramTypeNameLength;
+
+        /**
+         * 参数类型名
+         */
+        private byte[] paramTypeName;
+
+        /**
+         * 参数内容长度
+         */
+        private byte paramValueLength;
+
+        /**
+         * 参数内容
+         */
+        private byte[] paramValue;
+    }
 
 }
