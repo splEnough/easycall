@@ -29,7 +29,6 @@ public class PooledConnectionFactory extends ConnectionFactoryAdapter {
 //    private int allIdleSeconds = 5;
 
     private ConnectionManager connectionManager;
-    private EventLoopGroup group = new NioEventLoopGroup();
 
     public PooledConnectionFactory(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
@@ -52,7 +51,7 @@ public class PooledConnectionFactory extends ConnectionFactoryAdapter {
 //                            // 处理IdleStateEvent，Channel、Connection管理Handler
 //                            ch.pipeline().addLast(new ClientChannelConnectionManageHandler(connectionManager));
                             ch.pipeline().addLast(new EchoClientHandler());
-                            ch.pipeline().addLast(new ClientHeartBeatHandler());
+                            ch.pipeline().addLast(new ClientHeartBeatHandler(connectionManager));
                         }
                     })
                     .channel(NioSocketChannel.class)

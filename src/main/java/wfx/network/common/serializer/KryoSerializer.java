@@ -1,4 +1,4 @@
-package wfx.kryo;
+package wfx.network.common.serializer;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;
@@ -6,6 +6,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
 /**
+ * kryo序列化器
  * @author 翁富鑫 2019/2/27 16:20
  */
 public class KryoSerializer {

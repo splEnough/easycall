@@ -1,44 +1,34 @@
 package wfx.network.common.packet;
 
+import wfx.network.common.serializer.SerializeType;
+
 import java.util.List;
 
 /**
- * 请求数据包
+ * 请求数据包，只负责进行请求数据的保存，解析操作交由其他类完成
  * @author 翁富鑫 2019/3/7 16:33
  */
-public class RequsetPacket implements Packet{
+public class RequestPacket extends PacketAdapter{
     /**
-     * 本次请求的传输数据类型
+     * 目标服务名
      */
-    private MessageType messageType;
+    private String targetService;
     /**
-     * 序列化类型
+     * 目标方法名
      */
-    private SerializeType serializeType;
+    private String targetMethod;
     /**
-     * 传输的数据
+     * 目标服务版本
      */
-    private byte[] data;
+    private String targetVersion;
 
-    /**
-     * 需要传输的对象，用于在本类中进行序列化，然后再传输
-     */
-    private List<Object> transObjects ;
-
-
-
-    @Override
-    public MessageType getMessageType() {
-        return messageType;
+    public RequestPacket(MessageType messageType, SerializeType serializeType, String targetService, String targetMethod, String targetVersion, List<Object> transObjects) {
+        this.messageType = messageType;
+        this.serializeType = serializeType;
+        this.targetService = targetService;
+        this.targetMethod = targetMethod;
+        this.targetVersion = targetVersion;
+        this.transObjects = transObjects;
     }
 
-    @Override
-    public SerializeType getSerializeType() {
-        return serializeType;
-    }
-
-    @Override
-    public byte[] getData() {
-        return data;
-    }
 }

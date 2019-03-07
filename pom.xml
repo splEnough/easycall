@@ -34,6 +34,13 @@
       <version>${netty.all.version}</version>
     </dependency>
 
+    <!--kryo序列化相关-->
+    <dependency>
+      <groupId>com.esotericsoftware</groupId>
+      <artifactId>kryo</artifactId>
+      <version>4.0.2</version>
+    </dependency>
+
   </dependencies>
 
 </project>
