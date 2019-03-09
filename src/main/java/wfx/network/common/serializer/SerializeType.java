@@ -7,5 +7,14 @@ package wfx.network.common.serializer;
 public enum SerializeType {
     PROTOBUF,
     KRYO,
-    JDK;
+    JDK,
+    TEST;
+    public static SerializeType getTypeByOrdinal(int ordinal) {
+        switch (ordinal) {
+            case 0 : return PROTOBUF;
+            case 1 : return KRYO;
+            case 2 : return JDK;
+        }
+        return TEST;
+    }
 }

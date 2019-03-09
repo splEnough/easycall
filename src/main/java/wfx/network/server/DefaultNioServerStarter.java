@@ -7,6 +7,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import wfx.network.server.nettyhandler.EchoServerHandler;
 import wfx.network.server.nettyhandler.IdleChannelCloseHandler;
@@ -31,9 +32,11 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
     private Integer bindTimeout = 5;
 
     // 空闲检测参数
-    private int readerIdleSeconds = 5;
-    private int writerIdleSeconds = 5;
-    private int allIdleSeconds = 5;
+    private int readerIdleSeconds = 8;
+    // disabled
+    private int writerIdleSeconds = 0;
+    // disabled
+    private int allIdleSeconds = 0;
 
     public DefaultNioServerStarter(ServerInitializer serverInitializer) {
         this.serverInitializer = serverInitializer;
@@ -50,6 +53,8 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
+                        // 数据解码器
+                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1048576,0,4,0,4));
                         // 空闲检测
                         ch.pipeline().addLast(new IdleStateHandler(readerIdleSeconds,writerIdleSeconds,allIdleSeconds));
                         // 关闭空闲连接

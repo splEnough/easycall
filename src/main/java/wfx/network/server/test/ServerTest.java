@@ -14,7 +14,7 @@ public class ServerTest {
         ServerInitializer initializer = new ServerInitializer();
         ServerStarter serverStarter = new DefaultNioServerStarter(initializer);
         serverStarter.start();
-        TimeUnit.SECONDS.sleep(20);
-        serverStarter.close();
+//        TimeUnit.SECONDS.sleep(20);
+//        serverStarter.close();
     }
 }

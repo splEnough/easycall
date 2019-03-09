@@ -3,13 +3,12 @@ package wfx.network.client.connection;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import wfx.network.client.nettyhandler.EchoClientHandler;
-import wfx.network.client.nettyhandler.ClientHeartBeatHandler;
+import wfx.network.client.nettyhandler.connection.EchoClientHandler;
+import wfx.network.client.nettyhandler.connection.ClientHeartBeatHandler;
 import wfx.network.common.connection.Connection;
 import wfx.network.common.connection.ConnectionFactoryAdapter;
 import wfx.network.common.connection.DefaultTcpConnection;
@@ -46,11 +45,13 @@ public class PooledConnectionFactory extends ConnectionFactoryAdapter {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            // 空闲检测，最多在心跳发送超过三秒没收到回复后会关闭Channel
+                            // 写出数据分包处理器
+                            ch.pipeline().addLast(new LengthFieldPrepender(4));
+                            // 连接检测，最多在心跳发送超过5秒没收到回复后会关闭Channel
                             ch.pipeline().addLast(new IdleStateHandler(8,5,0));
 //                            // 处理IdleStateEvent，Channel、Connection管理Handler
 //                            ch.pipeline().addLast(new ClientChannelConnectionManageHandler(connectionManager));
-                            ch.pipeline().addLast(new EchoClientHandler());
+//                            ch.pipeline().addLast(new EchoClientHandler());
                             ch.pipeline().addLast(new ClientHeartBeatHandler(connectionManager));
                         }
                     })
@@ -63,6 +64,7 @@ public class PooledConnectionFactory extends ConnectionFactoryAdapter {
                 ChannelFuture closeFuture = channelFuture.channel().closeFuture();
                 // 添加Channel关闭的监听器，关闭Channel后从ConnectionManager中移除
                 closeFuture.addListener((future) -> {
+                    System.out.println("PooledConnectionFactory --- removeConnection,Thread:" + Thread.currentThread().getName());
                     connectionManager.removeConnection(channelFuture.channel());
                 });
                 Connection connection = new DefaultTcpConnection(channelFuture.channel());

@@ -22,6 +22,11 @@ public abstract class PacketAdapter implements Packet {
      */
     protected List<Object> transObjects;
 
+    /**
+     * 传输的对象所一一对应的类型名
+     */
+    protected List<String> paramTypeNames;
+
     @Override
     public MessageType getMessageType() {
         return messageType;
@@ -37,4 +42,24 @@ public abstract class PacketAdapter implements Packet {
         return transObjects;
     }
 
+    @Override
+    public List<String> getObjectTypeNames() {
+        return paramTypeNames;
+    }
+
+    public void setParamTypeNames(List<String> paramTypeNames) {
+        this.paramTypeNames = paramTypeNames;
+    }
+
+    public void setMessageType(MessageType messageType) {
+        this.messageType = messageType;
+    }
+
+    public void setSerializeType(SerializeType serializeType) {
+        this.serializeType = serializeType;
+    }
+
+    public void setTransObjects(List<Object> transObjects) {
+        this.transObjects = transObjects;
+    }
 }

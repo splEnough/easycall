@@ -3,6 +3,7 @@ package wfx.network.common.serializer;
 import java.io.Serializable;
 
 /**
+ * 序列化工具
  * @author 翁富鑫 2019/3/7 20:10
  */
 public class SerializerResolver {
@@ -27,6 +28,27 @@ public class SerializerResolver {
                     return null;
                 default:
                     // TODO 实现JDK序列化
+                    return null;
+            }
+        }  catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public static Object deSerialize(byte[] data , SerializeType serializeType) throws Exception{
+        if (data == null || data.length == 0) {
+            throw new Exception("数据不能被反序列化");
+        }
+        try {
+            switch (serializeType) {
+                case KRYO:
+                    return KryoSerializer.deSerialize(data);
+                case PROTOBUF:
+                    // TODO 实现protobuf反序列化
+                    return null;
+                default:
+                    // TODO 实现JDK反序列化
                     return null;
             }
         }  catch (Exception e) {

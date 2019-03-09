@@ -113,7 +113,7 @@ public class DefaultConnectionManager implements ConnectionManager {
             if (connections == null || connections.size() == 0) {
                 return true;
             }
-            System.out.println("DefaultConnectionManager -- removeConnection() -- 关闭Channel--");
+            System.out.println("DefaultConnectionManager -- removeConnection() -- 关闭Channel-- Thread:" + Thread.currentThread().getName());
             channel.close();
             // 找到channel所在的Connection然后进行删除
             return connections.removeIf((connection) -> connection.getConnectionChannel().compareTo(channel) == 0);
