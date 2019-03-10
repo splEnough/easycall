@@ -9,6 +9,8 @@ import easycall.network.common.packet.Packet;
 import easycall.network.common.packet.RequestPacket;
 import easycall.network.common.packet.ResponsePacket;
 import easycall.network.common.serializer.SerializeType;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.ReferenceCountUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,33 +19,39 @@ import java.util.List;
  * 服务端对于客户端发送的心跳数据的处理类
  * @author 翁富鑫 2019/3/10 11:34
  */
-public class ServerHeartBeatHandler extends ChannelInboundHandlerAdapter {
+public class ServerHeartBeatHandler extends SimpleChannelInboundHandler {
 
     private static final String HEARTBEAT_SEQUENCE = "HEART_BEAT_RESPONSE";
 
     private static final SerializeType HEARTBEAT_SERIALIZE_TYPE = SerializeType.PROTO_STUFF;
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         Packet packet = Framer.decode((ByteBuf) msg);
         if (packet instanceof RequestPacket) {
             RequestPacket requestPacket = (RequestPacket) packet;
             switch (packet.getMessageType()) {
                 case HEARTBEAT_REQUEST:
-                    handlerRequest(requestPacket);
-                    ResponsePacket responsePacket = new ResponsePacket();
-                    responsePacket.setMessageType(MessageType.HEARTBEAT_RESPONSE);
-                    responsePacket.setSerializeType(HEARTBEAT_SERIALIZE_TYPE);
-                    List<Object> transObjects = new ArrayList<>();
-                    transObjects.add(HEARTBEAT_SEQUENCE);
-                    responsePacket.setTransObjects(transObjects);
-                    // 响应所属请求的id
-                    responsePacket.setRequestId(packet.getRequestId());
-                    List<String> paramTypeNames = new ArrayList<>();
-                    paramTypeNames.add(String.class.getTypeName());
-                    responsePacket.setParamTypeNames(paramTypeNames);
-                    // 发送心跳响应
-                    ctx.writeAndFlush(Framer.encode(responsePacket));
+                    try {
+                        ByteBuf result = null;
+                        handlerRequest(requestPacket);
+                        ResponsePacket responsePacket = new ResponsePacket();
+                        responsePacket.setMessageType(MessageType.HEARTBEAT_RESPONSE);
+                        responsePacket.setSerializeType(HEARTBEAT_SERIALIZE_TYPE);
+                        List<Object> transObjects = new ArrayList<>();
+                        transObjects.add(HEARTBEAT_SEQUENCE);
+                        responsePacket.setTransObjects(transObjects);
+                        // 响应所属请求的id
+                        responsePacket.setRequestId(packet.getRequestId());
+                        List<String> paramTypeNames = new ArrayList<>();
+                        paramTypeNames.add(String.class.getTypeName());
+                        responsePacket.setParamTypeNames(paramTypeNames);
+                        // 发送心跳响应
+                        result = Framer.encode(responsePacket);
+                        ctx.writeAndFlush(result);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case SERVICE_DATA_REQUEST:
                     handlerRequest(requestPacket);
@@ -52,7 +60,6 @@ public class ServerHeartBeatHandler extends ChannelInboundHandlerAdapter {
         } else {
             throw new Exception("不支持的请求数据");
         }
-        super.channelRead(ctx, msg);
     }
 
     private void handlerRequest(RequestPacket requestPacket) {

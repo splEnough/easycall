@@ -28,7 +28,7 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
     private Integer bindTimeout = 5;
 
     // 空闲检测参数，与客户端的读空闲超时参数保持一致
-    private int readerIdleSeconds = 30;
+    private int readerIdleSeconds = 5;
     // disabled
     private int writerIdleSeconds = 0;
     // disabled

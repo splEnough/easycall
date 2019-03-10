@@ -18,7 +18,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <netty.all.version>4.1.32.Final</netty.all.version>
     <kryo.version>4.0.2</kryo.version>
-    <protostuff.version>1.6.0</protostuff.version>
+    <protostuff.version>1.5.9</protostuff.version>
   </properties>
 
   <dependencies>

@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
 import easycall.network.common.connection.management.ConnectionManager;
@@ -21,7 +22,7 @@ import java.util.List;
  * 心跳数据处理器，负责接受心跳数据、发送心跳数据
  * @author 翁富鑫 2019/3/3 16:23
  */
-public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
+public class ClientHeartBeatHandler extends SimpleChannelInboundHandler {
 
     /**
      * 持有一个连接管理器
@@ -44,7 +45,7 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
     }
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         Packet packet = Framer.decode((ByteBuf) msg);
         if (packet instanceof RequestPacket) {
             throw new Exception("不支持的请求类型");
@@ -53,11 +54,6 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
         if (packet.getMessageType() == MessageType.HEARTBEAT_RESPONSE) {
             // 心跳返回数据，不做特殊处理
             handleHeartbeatResponse(responsePacket);
-            // 释放内存
-            ReferenceCountUtil.release(msg);
-        } else {
-            // 业务数据不在当前的Handler中做处理
-            super.channelRead(ctx, msg);
         }
     }
 
@@ -79,6 +75,7 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
                     break;
                 case WRITER_IDLE:
                     // 写空闲时间超时，发送心跳数据
+                    ByteBuf result = null;
                     try {
                         // 心跳数据封装为Packet
                         RequestPacket packet = new RequestPacket();
@@ -94,7 +91,7 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
                         packet.setTransObjects(transObjects);
                         packet.setSerializeType(HEARTBEAT_SERIALIZE_TYPE);
                         // 发送心跳数据
-                        ByteBuf result = Framer.encode(packet);
+                        result = Framer.encode(packet);
                         ctx.writeAndFlush(result);
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -54,7 +54,6 @@ public class RpcProtocolCodec {
         byteBuf.writeInt(bodyLength);
         // 写入数据体
         byteBuf.writeBytes(bodyData);
-        ReferenceCountUtil.release(bodyData);
         return byteBuf;
     }
 
@@ -92,15 +91,20 @@ public class RpcProtocolCodec {
         int methodParamCount = byteBuf.readInt();
         rpcProtocol.setMethodParamCount(methodParamCount);
         // 服务名
-        rpcProtocol.setServiceName(ByteBufUtil.getBytes(byteBuf.readBytes(serviceNameLength)));
+        ByteBuf serviceNameBuf = byteBuf.readBytes(serviceNameLength);
+        rpcProtocol.setServiceName(ByteBufUtil.getBytes(serviceNameBuf));
+        ReferenceCountUtil.release(serviceNameBuf);
         // 方法名
-        rpcProtocol.setMethodName(ByteBufUtil.getBytes(byteBuf.readBytes(methodNameLength)));
+        ByteBuf methodNameBuf = byteBuf.readBytes(methodNameLength);
+        rpcProtocol.setMethodName(ByteBufUtil.getBytes(methodNameBuf));
+        ReferenceCountUtil.release(methodNameBuf);
         // 数据体长度
         int bodyLength = byteBuf.readInt();
         rpcProtocol.setBodyDataLength(bodyLength);
         // 数据体
         ByteBuf bodyData = byteBuf.readBytes(bodyLength);
         List<ParamTypeAndValue> paramTypeAndValueList = decodeParamTypeAndValue(bodyData);
+        ReferenceCountUtil.release(bodyData);
         rpcProtocol.setParamValues(paramTypeAndValueList);
         return rpcProtocol;
     }
@@ -116,9 +120,13 @@ public class RpcProtocolCodec {
             // 数据值长度
             int paramValueLength = bodyData.readInt();
             // 参数类型名
-            byte[] paramTypeName = ByteBufUtil.getBytes(bodyData.readBytes(paramTypeNameLength));
+            ByteBuf paramTypeNameBuf = bodyData.readBytes(paramTypeNameLength);
+            byte[] paramTypeName = ByteBufUtil.getBytes(paramTypeNameBuf);
+            ReferenceCountUtil.release(paramTypeNameBuf);
             // 对象数据
-            byte[] paramValue = ByteBufUtil.getBytes(bodyData.readBytes(paramValueLength));
+            ByteBuf paramValueBuf = bodyData.readBytes(paramValueLength);
+            byte[] paramValue = ByteBufUtil.getBytes(paramValueBuf);
+            ReferenceCountUtil.release(paramValueBuf);
             ParamTypeAndValue paramTypeAndValue = new ParamTypeAndValue(paramTypeNameLength,paramTypeName,paramValueLength,paramValue);
             list.add(paramTypeAndValue);
         }
