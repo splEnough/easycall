@@ -5,13 +5,13 @@ package easycall.network.common.serializer;
  * @author 翁富鑫 2019/3/7 16:30
  */
 public enum SerializeType {
-    PROTOBUF,
+    PROTO_STUFF,
     KRYO,
     JDK,
     TEST;
     public static SerializeType getTypeByOrdinal(int ordinal) {
         switch (ordinal) {
-            case 0 : return PROTOBUF;
+            case 0 : return PROTO_STUFF;
             case 1 : return KRYO;
             case 2 : return JDK;
         }

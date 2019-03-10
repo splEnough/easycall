@@ -23,12 +23,10 @@ public class SerializerResolver {
             switch (serializeType) {
                 case KRYO:
                     return KryoSerializer.serializeObject(transObject);
-                case PROTOBUF:
-                    // TODO 实现protobuf序列化
-                    return null;
+                case PROTO_STUFF:
+                    return ProtoStuffSerializer.serialize(transObject);
                 default:
-                    // TODO 实现JDK序列化
-                    return null;
+                    return JdkSerializer.serializeObject(transObject);
             }
         }  catch (Exception e) {
             e.printStackTrace();
@@ -36,7 +34,7 @@ public class SerializerResolver {
         }
     }
 
-    public static Object deSerialize(byte[] data , SerializeType serializeType) throws Exception{
+    public static Object deSerialize(byte[] data , SerializeType serializeType, Class dataType) throws Exception{
         if (data == null || data.length == 0) {
             throw new Exception("数据不能被反序列化");
         }
@@ -44,15 +42,12 @@ public class SerializerResolver {
             switch (serializeType) {
                 case KRYO:
                     return KryoSerializer.deSerialize(data);
-                case PROTOBUF:
-                    // TODO 实现protobuf反序列化
-                    return null;
+                case PROTO_STUFF:
+                    return ProtoStuffSerializer.deSerialize(data, dataType);
                 default:
-                    // TODO 实现JDK反序列化
-                    return null;
+                    return JdkSerializer.deSerialize(data);
             }
         }  catch (Exception e) {
-            e.printStackTrace();
             throw e;
         }
     }

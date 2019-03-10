@@ -21,6 +21,8 @@ public class ServerHeartBeatHandler extends ChannelInboundHandlerAdapter {
 
     private static final String HEARTBEAT_SEQUENCE = "HEART_BEAT_RESPONSE";
 
+    private static final SerializeType HEARTBEAT_SERIALIZE_TYPE = SerializeType.PROTO_STUFF;
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Packet packet = Framer.decode((ByteBuf) msg);
@@ -31,8 +33,7 @@ public class ServerHeartBeatHandler extends ChannelInboundHandlerAdapter {
                     handlerRequest(requestPacket);
                     ResponsePacket responsePacket = new ResponsePacket();
                     responsePacket.setMessageType(MessageType.HEARTBEAT_RESPONSE);
-                    // 心跳数据使用KRYO进行序列化
-                    responsePacket.setSerializeType(SerializeType.KRYO);
+                    responsePacket.setSerializeType(HEARTBEAT_SERIALIZE_TYPE);
                     List<Object> transObjects = new ArrayList<>();
                     transObjects.add(HEARTBEAT_SEQUENCE);
                     responsePacket.setTransObjects(transObjects);

@@ -28,6 +28,17 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
      */
     private ConnectionManager connectionManager;
 
+    /**
+     * 心跳包的默认数据
+     */
+    private static final String HEARTBEAT_SERVICE = "heartbeat";
+    private static final String HEARTBEAT_METHOD = "heartbeat";
+    /**
+     * 心跳数据默认使用protostuff进行序列化
+     */
+    private static final SerializeType HEARTBEAT_SERIALIZE_TYPE = SerializeType.PROTO_STUFF;
+
+
     public ClientHeartBeatHandler(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
     }
@@ -78,11 +89,10 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
                         paramTypeNames.add(String.class.getTypeName());
                         packet.setParamTypeNames(paramTypeNames);
                         // 心跳数据的目标业务和方法名，默认值
-                        packet.setTargetService("heartbeat");
-                        packet.setTargetMethod("heartbeat");
+                        packet.setTargetService(HEARTBEAT_SERVICE);
+                        packet.setTargetMethod(HEARTBEAT_METHOD);
                         packet.setTransObjects(transObjects);
-                        // 心跳数据使用KRYO进行序列化
-                        packet.setSerializeType(SerializeType.KRYO);
+                        packet.setSerializeType(HEARTBEAT_SERIALIZE_TYPE);
                         // 发送心跳数据
                         ByteBuf result = Framer.encode(packet);
                         ctx.writeAndFlush(result);

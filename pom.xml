@@ -17,6 +17,8 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <netty.all.version>4.1.32.Final</netty.all.version>
+    <kryo.version>4.0.2</kryo.version>
+    <protostuff.version>1.6.0</protostuff.version>
   </properties>
 
   <dependencies>
@@ -38,8 +40,23 @@
     <dependency>
       <groupId>com.esotericsoftware</groupId>
       <artifactId>kryo</artifactId>
-      <version>4.0.2</version>
+      <version>${kryo.version}</version>
     </dependency>
+
+    <!--protostuff序列化-->
+    <dependency>
+      <groupId>io.protostuff</groupId>
+      <artifactId>protostuff-runtime</artifactId>
+      <version>${protostuff.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.protostuff</groupId>
+      <artifactId>protostuff-core</artifactId>
+      <version>${protostuff.version}</version>
+    </dependency>
+
+
 
   </dependencies>
 

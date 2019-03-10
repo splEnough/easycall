@@ -19,9 +19,9 @@ public class DefaultConnectionManager implements ConnectionManager {
      * 注意：connectionId与对应的ChannelId保持一致
      */
     private Map<String, List<String>> hostConnectionIdsMap;
-    private final String addConnLock = "lock";
+
     /**
-     * ChannelId(long)以及对应的Connection
+     * ChannelId(ChannelId.asLongText())以及对应的Connection
      */
     private Map<String, Connection> idConnectionMap;
 
@@ -76,11 +76,16 @@ public class DefaultConnectionManager implements ConnectionManager {
     @Override
     public Connection getIdleConnectionByIpAndPort(String ip, Integer port) {
         List<Connection> connections = this.getConnectionsByIpAndPort(ip, port);
-        // TODO 使用更优秀的策略获取Connection
         if (connections != null && connections.size() > 0) {
-            int size = connections.size();
-            // 暂时随机返回一个
-            return connections.get(new Random().nextInt(size));
+            // 返回一个休眠时间最长的
+            Connection maxIdleConnection = connections.get(0);
+            for (Connection connection : connections) {
+                if (connection.getLastWriteTime() < maxIdleConnection.getLastWriteTime()) {
+                    // 找到lastWriteTime最小的
+                    maxIdleConnection = connection;
+                }
+            }
+            return maxIdleConnection;
         }
         return null;
     }

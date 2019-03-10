@@ -5,12 +5,13 @@ import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
-/**
- * kryo序列化器
- * @author 翁富鑫 2019/2/27 16:20
- */
-public class KryoSerializer {
+import java.io.*;
 
+/**
+ * jdk序列化
+ * @author 翁富鑫 2019/3/10 17:58
+ */
+public class JdkSerializer {
     /**
      * 序列化对象
      * @param object 要序列化的对象
@@ -20,40 +21,38 @@ public class KryoSerializer {
         if (object == null) {
             throw new Exception("序列化的数据不能为空");
         }
-        Kryo kryo = new Kryo();
-        Output output = new Output(1024);
-        byte[] data = null;
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
         try {
-            kryo.writeClassAndObject(output, object);
-            data = output.toBytes();
+            objectOutputStream.writeObject(object);
+            return outputStream.toByteArray();
         } catch (Exception e) {
-            throw new KryoException("序列化数据失败");
+            e.printStackTrace();
+            throw e;
         } finally {
-            output.close();
+            outputStream.close();
+            objectOutputStream.close();
         }
-        return data;
     }
 
     /**
      * 反序列化
-     * @param data 要反序列化的字节
+     * @throws Exception
      */
     public static Object deSerialize(byte[] data) throws Exception{
         if (data == null || data.length == 0) {
             throw new Exception("反序列化的数据不能为空");
         }
-        Kryo kryo = new Kryo();
-        Input input = new Input(data);
-        Object result;
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         try {
-            result = kryo.readClassAndObject(input);
+            return objectInputStream.readObject();
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         } finally {
-            input.close();
+            byteArrayInputStream.close();
+            objectInputStream.close();
         }
-        return result;
     }
-
 }

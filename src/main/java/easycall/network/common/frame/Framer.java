@@ -109,7 +109,8 @@ public class Framer {
             List<String> objectTypeNames = new ArrayList<>();
             // 数据反序列化
             for (ParamTypeAndValue paramTypeAndValue : rpcProtocol.getParamValues()) {
-                transObjects.add(SerializerResolver.deSerialize(paramTypeAndValue.getParamValue(), packet.getSerializeType()));
+                Class serializeType = Class.forName(new String(paramTypeAndValue.getParamTypeName()));
+                transObjects.add(SerializerResolver.deSerialize(paramTypeAndValue.getParamValue(), packet.getSerializeType(), serializeType));
                 objectTypeNames.add(new String(paramTypeAndValue.getParamTypeName()));
             }
             packet.setTransObjects(transObjects);
@@ -132,7 +133,8 @@ public class Framer {
             List<String> objectTypeNames = new ArrayList<>();
             // 数据反序列化
             for (ParamTypeAndValue paramTypeAndValue : rpcProtocol.getParamValues()) {
-                transObjects.add(SerializerResolver.deSerialize(paramTypeAndValue.getParamValue(), packet.getSerializeType()));
+                Class serializeType = Class.forName(new String(paramTypeAndValue.getParamTypeName()));
+                transObjects.add(SerializerResolver.deSerialize(paramTypeAndValue.getParamValue(), packet.getSerializeType(), serializeType));
                 objectTypeNames.add(new String(paramTypeAndValue.getParamTypeName()));
             }
             packet.setTransObjects(transObjects);
