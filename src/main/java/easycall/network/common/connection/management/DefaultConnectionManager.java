@@ -10,10 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 默认的连接管理器
- * // TODO 1、Channel通过id能快速获取
- * // TODO 2、能在一组连接中选择空闲的连接进行返回
- * // TODO 3、客户端和服务端有不同的Handler进行连接的添加
- *
  * @author 翁富鑫 2019/3/1 21:21
  */
 public class DefaultConnectionManager implements ConnectionManager {
@@ -39,6 +35,11 @@ public class DefaultConnectionManager implements ConnectionManager {
      */
     private IdleConnectionRemoveManager idleConnectionRemoveManager;
 
+    /**
+     * 检测器线程
+     */
+    private Thread detectorThread ;
+
     public DefaultConnectionManager() {
         hostConnectionIdsMap = new ConcurrentHashMap<>();
         idConnectionMap = new ConcurrentHashMap<>();
@@ -48,7 +49,8 @@ public class DefaultConnectionManager implements ConnectionManager {
 
     private void init() {
         // 启动空闲连接监听
-        new Thread(idleConnectionRemoveManager).start();
+        detectorThread = new Thread(idleConnectionRemoveManager);
+        detectorThread.start();
     }
 
     @Override
@@ -174,6 +176,8 @@ public class DefaultConnectionManager implements ConnectionManager {
         idConnectionMap.clear();
         // 解除主机单元与连接id的绑定
         hostConnectionIdsMap.clear();
+        // 停止空闲检测任务
+        this.detectorThread.stop();
     }
 
     private String getConnectionKey(String ip, Integer port) {
@@ -191,17 +195,8 @@ public class DefaultConnectionManager implements ConnectionManager {
          */
         private int maxIdleTime;
 
-        /**
-         * ChannelId所对应的Channel的上次写数据时间，单位毫秒
-         */
-        private Map<String, Long> channelLastWriteTimeMap = new HashMap<>();
-
         public IdleConnectionRemoveManager(Integer maxIdleTime) {
             this.maxIdleTime = maxIdleTime;
-        }
-
-        public void resetLastWriteTime(String longChannelId) {
-            idConnectionMap.get(longChannelId).resetLastWriteTime(System.currentTimeMillis());
         }
 
         @Override

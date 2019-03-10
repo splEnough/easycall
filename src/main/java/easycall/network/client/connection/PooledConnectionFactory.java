@@ -76,9 +76,6 @@ public class PooledConnectionFactory extends ConnectionFactoryAdapter {
             } catch (Exception e) {
                 e.printStackTrace();
                 throw e;
-            } finally {
-                // TODO 在合适位置进行关闭
-//                group.shutdownGracefully();
             }
         }
         return existConnection;

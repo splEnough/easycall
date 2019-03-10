@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 发送心跳的Handler，TODO 存在的问题：永远会保活，因为一直会发送心跳，需要增加一个机制能让其在指定时间内无业务数据发送时，关闭连接
+ * 心跳数据处理器，负责接受心跳数据、发送心跳数据
  * @author 翁富鑫 2019/3/3 16:23
  */
 public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
@@ -34,7 +34,6 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        // TODO 处理接受到的心跳响应数据
         Packet packet = Framer.decode((ByteBuf) msg);
         if (packet instanceof RequestPacket) {
             throw new Exception("不支持的请求类型");
@@ -78,7 +77,7 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
                         List<String> paramTypeNames = new ArrayList<>();
                         paramTypeNames.add(String.class.getTypeName());
                         packet.setParamTypeNames(paramTypeNames);
-                        // 心跳数据的目标业务和方法名
+                        // 心跳数据的目标业务和方法名，默认值
                         packet.setTargetService("heartbeat");
                         packet.setTargetMethod("heartbeat");
                         packet.setTransObjects(transObjects);
@@ -108,8 +107,7 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter{
         List<String> paramTypeNames = responsePacket.getObjectTypeNames();
         int size = objectList.size();
         for (int i = 0 ; i < size;i++) {
-            System.out.print(i + ": type:" + paramTypeNames.get(i) + ",value:" + objectList.get(i));
+            System.out.println(i + ": type:" + paramTypeNames.get(i) + ",value:" + objectList.get(i));
         }
-        System.out.println();
     }
 }

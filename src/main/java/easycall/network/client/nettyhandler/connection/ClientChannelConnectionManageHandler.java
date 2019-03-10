@@ -11,6 +11,7 @@ import easycall.network.common.connection.management.ConnectionManager;
  * 用于处理空闲Channel，关闭Connection和Channel
  * @author 翁富鑫 2019/3/2 15:13
  */
+@Deprecated
 public class ClientChannelConnectionManageHandler extends ChannelDuplexHandler {
 
     private ConnectionManager connectionManager;
@@ -22,8 +23,6 @@ public class ClientChannelConnectionManageHandler extends ChannelDuplexHandler {
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
-            // TODO 处理三种事件
-
             Channel channel = ctx.channel();
 
             if (((IdleStateEvent) evt).state() == IdleState.READER_IDLE) {

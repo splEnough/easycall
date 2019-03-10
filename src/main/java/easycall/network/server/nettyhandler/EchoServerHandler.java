@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * @author 翁富鑫 2019/3/3 11:10
  */
+@Deprecated
 public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
