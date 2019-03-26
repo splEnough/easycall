@@ -23,9 +23,9 @@ import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 public class PooledConnectionFactory extends ConnectionFactoryAdapter {
 
     // 读空闲最大30s，与服务端的读空闲时间保持相同
-    private static final int readerIdleSeconds = 30;
+    private static final int readerIdleSeconds = 5;
     // 写空闲最大25s，保证最多在心跳发送超过5秒没收到回复后会关闭Channel
-    private static final int writerIdleSeconds = 25;
+    private static final int writerIdleSeconds = 2;
     // disabled
     private static final int allIdleSeconds = 0;
 

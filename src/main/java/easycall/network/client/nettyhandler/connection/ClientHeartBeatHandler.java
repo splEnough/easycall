@@ -1,19 +1,17 @@
 package easycall.network.client.nettyhandler.connection;
 
+import easycall.codec.packet.MessageType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.util.ReferenceCountUtil;
 import easycall.network.common.connection.management.ConnectionManager;
-import easycall.network.common.frame.Framer;
-import easycall.network.common.packet.MessageType;
-import easycall.network.common.packet.Packet;
-import easycall.network.common.packet.RequestPacket;
-import easycall.network.common.packet.ResponsePacket;
-import easycall.network.common.serializer.SerializeType;
+import easycall.codec.frame.Framer;
+import easycall.codec.packet.Packet;
+import easycall.codec.packet.RequestPacket;
+import easycall.codec.packet.ResponsePacket;
+import easycall.codec.serializer.SerializeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +64,6 @@ public class ClientHeartBeatHandler extends SimpleChannelInboundHandler {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             Channel channel = ctx.channel();
-            // 只处理读空闲
             switch (((IdleStateEvent) evt).state()) {
                 case READER_IDLE:
                     // 读空闲时间超时，关闭连接
@@ -84,7 +81,7 @@ public class ClientHeartBeatHandler extends SimpleChannelInboundHandler {
                         transObjects.add(HEARTBEAT_SEQUENCE);
                         List<String> paramTypeNames = new ArrayList<>();
                         paramTypeNames.add(String.class.getTypeName());
-                        packet.setParamTypeNames(paramTypeNames);
+                        packet.setTransObjectTypeNames(paramTypeNames);
                         // 心跳数据的目标业务和方法名，默认值
                         packet.setTargetService(HEARTBEAT_SERVICE);
                         packet.setTargetMethod(HEARTBEAT_METHOD);

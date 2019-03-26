@@ -1,5 +1,6 @@
 package easycall.network.server;
 
+import easycall.thread.ExecutorManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -7,7 +8,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import easycall.network.server.nettyhandler.IdleChannelCloseHandler;
-import easycall.network.server.nettyhandler.ServerHeartBeatHandler;
+import easycall.network.server.nettyhandler.RequestDataHandlerDispatcher;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -34,9 +35,15 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
     // disabled
     private int allIdleSeconds = 0;
 
-    public DefaultNioServerStarter(ServerInitializer serverInitializer) {
+    /**
+     * 任务执行管理器
+     */
+    private ExecutorManager executorManager;
+
+    public DefaultNioServerStarter(ServerInitializer serverInitializer, ExecutorManager executorManager) {
         this.serverInitializer = serverInitializer;
         this.port = Integer.parseInt(serverInitializer.getInitProperties().getProperty("port"));
+        this.executorManager = executorManager;
     }
 
     @Override
@@ -55,8 +62,8 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
                         ch.pipeline().addLast(new IdleStateHandler(readerIdleSeconds,writerIdleSeconds,allIdleSeconds));
                         // 关闭空闲连接
                         ch.pipeline().addLast(new IdleChannelCloseHandler());
-                        // 心跳处理器
-                        ch.pipeline().addLast(new ServerHeartBeatHandler());
+                        // 请求数据处理器
+                        ch.pipeline().addLast(new RequestDataHandlerDispatcher(executorManager));
 //                        ch.pipeline().addLast(new EchoServerHandler());
                     }
                 });

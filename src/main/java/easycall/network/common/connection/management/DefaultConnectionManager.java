@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 默认的连接管理器
+ * 默认的连接管理器，管理客户端的连接
  * @author 翁富鑫 2019/3/1 21:21
  */
 public class DefaultConnectionManager implements ConnectionManager {
@@ -34,6 +34,11 @@ public class DefaultConnectionManager implements ConnectionManager {
      * 空闲检测器
      */
     private IdleConnectionRemoveManager idleConnectionRemoveManager;
+
+    /**
+     * 每个host+port上最多建立的TCP连接，默认为5个
+     */
+    private static final Integer eachPortMaxConnection = 5;
 
     /**
      * 检测器线程
@@ -76,7 +81,8 @@ public class DefaultConnectionManager implements ConnectionManager {
     @Override
     public Connection getIdleConnectionByIpAndPort(String ip, Integer port) {
         List<Connection> connections = this.getConnectionsByIpAndPort(ip, port);
-        if (connections != null && connections.size() > 0) {
+        if (connections != null && connections.size() > eachPortMaxConnection) {
+            // 当前host+port已经建立了eachPortMaxConnection个连接了，不能再创建
             // 返回一个休眠时间最长的
             Connection maxIdleConnection = connections.get(0);
             for (Connection connection : connections) {
@@ -87,6 +93,7 @@ public class DefaultConnectionManager implements ConnectionManager {
             }
             return maxIdleConnection;
         }
+        // 当前host+port所创建的连接数量还不足eachPortMaxConnection
         return null;
     }
 

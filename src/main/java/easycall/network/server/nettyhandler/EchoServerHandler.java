@@ -3,10 +3,10 @@ package easycall.network.server.nettyhandler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import easycall.network.common.frame.Framer;
-import easycall.network.common.packet.Packet;
-import easycall.network.common.packet.RequestPacket;
-import easycall.network.common.packet.ResponsePacket;
+import easycall.codec.frame.Framer;
+import easycall.codec.packet.Packet;
+import easycall.codec.packet.RequestPacket;
+import easycall.codec.packet.ResponsePacket;
 
 import java.util.List;
 

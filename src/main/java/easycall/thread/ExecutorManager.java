@@ -1,0 +1,31 @@
+package easycall.thread;
+
+import io.netty.channel.Channel;
+
+import java.io.Closeable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
+
+/**
+ * 线程管理器
+ * @author 翁富鑫 2019/3/25 11:03
+ */
+public interface ExecutorManager extends Closeable {
+
+    /**
+     * 提交一个任务，直接返回
+     * @param runnable 要执行的任务
+     * @return
+     */
+    void submitTask(Runnable runnable) throws RejectedExecutionException;
+
+    /**
+     * 分配一个专属的线程池
+     * @param corePoolSize
+     * @param maxPoolSize
+     * @param name
+     * @return
+     */
+    Executor allocatePrivateExecutor(Integer corePoolSize , Integer maxPoolSize, String name) ;
+
+}
