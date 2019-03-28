@@ -14,6 +14,7 @@ public interface ExecutorManager extends Closeable {
 
     /**
      * 提交一个任务，直接返回
+     * TODO 当任务拒绝执行时，dump内存
      * @param runnable 要执行的任务
      * @return
      */

@@ -9,9 +9,8 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.RetryForever;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
@@ -23,7 +22,7 @@ import java.util.concurrent.Executors;
  * 默认的Zookeeper注册中心客户端
  * @author 翁富鑫 2019/3/24 16:51
  */
-public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClient, InitializingBean {
+public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClient {
 
     /**
      * zookeeper
@@ -46,7 +45,7 @@ public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClien
     private static final int RETRY_INTERVAL_MS = 3000;
 
     /**
-     * 每个业务-版本对应的提供方服务器ip列表，key格式为：/+service+/+version
+     * 每个业务-版本对应的提供方服务器ip列表，key格式为：/+serviceconfig+/+version
      */
     private Map<String, List<String>> serviceVersionIpsListMap = new HashMap<>();
 
@@ -64,7 +63,10 @@ public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClien
         this.zookeeperConnectionString = zookeeperConnectionString;
     }
 
-    void init() {
+    /**
+     * 启动客户端
+     */
+    public void start() {
         zkClient = CuratorFrameworkFactory.builder()
                 .connectString(zookeeperConnectionString)
                 .namespace(SERVICE_PARENT_PATH)
@@ -74,7 +76,7 @@ public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClien
     }
 
     @Override
-    public void registerService(String serviceName, String version, String ip) {
+    public boolean registerService(String serviceName, String version, String ip) {
         String ipNodePath = "/" + serviceName + "/" + version + "/" + ip;
         try {
             Stat stat = zkClient.checkExists().creatingParentsIfNeeded().forPath(ipNodePath);
@@ -82,20 +84,40 @@ public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClien
                 // 还没有创建节点，则创建临时节点
                 zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(ipNodePath);
             }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 
     @Override
-    public void registerService(String serviceName, String version) {
+    public boolean registerService(String serviceName, String version) {
         try {
-            InetAddress address = InetAddress.getLocalHost();
-            String ip = address.getHostAddress();
-            registerService(serviceName , version , ip);
+            String ip = getCurrentHostIp();
+            return registerService(serviceName , version , ip);
         } catch (UnknownHostException e) {
             e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            return false;
         }
+    }
+
+    @Override
+    public boolean unRegisterService(String serviceName, String version) {
+        String ip = null;
+        try {
+            ip = getCurrentHostIp();
+            String currentPath = "/" + serviceName + "/" +  version + "/" + ip;
+            this.zkClient.delete().guaranteed().forPath(currentPath);
+            return true;
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
@@ -136,8 +158,8 @@ public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClien
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
-        init();
+    public void close() throws IOException {
+        this.zkClient.close();
     }
 
     private class ServicePathChildrenCacheListener implements PathChildrenCacheListener {
@@ -173,7 +195,7 @@ public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClien
                         }
                         List<ChildData> childDatas = event.getInitialData();
                         for (ChildData childData : childDatas) {
-                            String singleFullPath = event.getData().getPath();
+                            String singleFullPath = childData.getPath();
                             String singleIp = singleFullPath.substring(singleFullPath.lastIndexOf("/") + 1);
                             ipList.add(singleIp);
                         }
@@ -194,5 +216,11 @@ public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClien
                     break;
             }
         }
+    }
+
+    private String getCurrentHostIp() throws UnknownHostException {
+        InetAddress address = InetAddress.getLocalHost();
+        String ip = address.getHostAddress();
+        return ip;
     }
 }

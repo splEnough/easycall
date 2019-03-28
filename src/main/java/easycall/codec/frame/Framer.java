@@ -54,6 +54,8 @@ public class Framer {
             protocol.setSerializeType((byte) packet.getSerializeType().ordinal());
             // 目标业务名
             protocol.setServiceName(requestPacket.getTargetService().getBytes());
+            // 目标版本
+            protocol.setVersion(requestPacket.getTargetVersion().getBytes());
             // 目标方法名
             protocol.setMethodName(requestPacket.getTargetMethod().getBytes());
             // 参数个数
@@ -145,6 +147,7 @@ public class Framer {
             packet.setTransObjectTypeNames(objectTypeNames);
             // 服务相关信息
             packet.setTargetService(new String(rpcProtocol.getServiceName()));
+            packet.setTargetVersion(new String(rpcProtocol.getVersion()));
             packet.setTargetMethod(new String(rpcProtocol.getMethodName()));
             packet.setTimeout(rpcProtocol.getTimeout());
             return packet;

@@ -1,22 +1,25 @@
 package easycall.network.server;
 
+import easycall.config.ServerInitializer;
+import easycall.network.common.connection.handler.MagicCheckHandler;
+import easycall.serviceconfig.server.RpcProviderManager;
 import easycall.thread.ExecutorManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import easycall.network.server.nettyhandler.IdleChannelCloseHandler;
-import easycall.network.server.nettyhandler.RequestDataHandlerDispatcher;
+import easycall.network.server.handler.IdleChannelCloseHandler;
+import easycall.network.server.handler.RequestDataHandlerDispatcher;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 
 /**
- * 默认的服务端启动器
+ * 默认的服务端TCP监听启动器
  * @author 翁富鑫 2019/3/3 9:57
  */
 public class DefaultNioServerStarter extends ServerStarterAdapter {
@@ -40,31 +43,37 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
      */
     private ExecutorManager executorManager;
 
-    public DefaultNioServerStarter(ServerInitializer serverInitializer, ExecutorManager executorManager) {
+    private RpcProviderManager rpcProviderManager;
+
+    public DefaultNioServerStarter(ServerInitializer serverInitializer, ExecutorManager executorManager, RpcProviderManager rpcProviderManager) {
         this.serverInitializer = serverInitializer;
-        this.port = Integer.parseInt(serverInitializer.getInitProperties().getProperty("port"));
+        this.port = (Integer)(serverInitializer.getInitProperties().get("port"));
         this.executorManager = executorManager;
+        this.rpcProviderManager = rpcProviderManager;
     }
 
     @Override
     public void start() throws Exception{
         ServerBootstrap serverBootstrap = new ServerBootstrap();
-        serverBootstrap.group(super.group)
+        serverBootstrap.group(super.bossGroup,super.childGroup)
                 .localAddress(port)
                 .option(CONNECT_TIMEOUT_MILLIS, Long.valueOf(TimeUnit.SECONDS.toMillis(bindTimeout)).intValue())
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
+                        // 写出数据编码器
+                        ch.pipeline().addLast(new LengthFieldPrepender(4));
                         // 数据解码器
                         ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1048576,0,4,0,4));
+                        // 魔数校验器
+                        ch.pipeline().addLast(new MagicCheckHandler());
                         // 空闲检测
                         ch.pipeline().addLast(new IdleStateHandler(readerIdleSeconds,writerIdleSeconds,allIdleSeconds));
                         // 关闭空闲连接
                         ch.pipeline().addLast(new IdleChannelCloseHandler());
                         // 请求数据处理器
-                        ch.pipeline().addLast(new RequestDataHandlerDispatcher(executorManager));
-//                        ch.pipeline().addLast(new EchoServerHandler());
+                        ch.pipeline().addLast(new RequestDataHandlerDispatcher(executorManager, rpcProviderManager ,serverInitializer));
                     }
                 });
         try {
@@ -75,8 +84,4 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
         }
     }
 
-    @Override
-    public void close() throws IOException {
-        group.shutdownGracefully();
-    }
 }

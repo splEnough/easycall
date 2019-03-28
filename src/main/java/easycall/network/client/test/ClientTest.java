@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 public class ClientTest {
     public static void main(String[] args) throws Exception{
         ConnectionManager connectionManager = new DefaultConnectionManager();
+        // TODO 测试
+
         ConnectionFactory factory = new PooledConnectionFactory(connectionManager);
         Connection connection = factory.buildConnection("127.0.0.1",8888, 5,TimeUnit.SECONDS);
 //        TimeUnit.SECONDS.sleep(100);

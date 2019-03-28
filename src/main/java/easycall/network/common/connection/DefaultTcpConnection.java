@@ -14,6 +14,10 @@ public class DefaultTcpConnection implements Connection{
     private String sourceIp;
     private String targetIp;
     private Integer targetPort;
+    /**
+     * 当前连接是否以已经关闭
+     */
+    private boolean close = false;
 
     /**
      * 当前连接对应的Channel
@@ -70,7 +74,13 @@ public class DefaultTcpConnection implements Connection{
     }
 
     @Override
+    public boolean isClose() {
+        return close;
+    }
+
+    @Override
     public void close() throws IOException {
+        close = true;
         connectionChannel.close();
     }
 

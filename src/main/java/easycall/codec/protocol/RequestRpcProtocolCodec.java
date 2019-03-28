@@ -37,12 +37,16 @@ public class RequestRpcProtocolCodec {
         byteBuf.writeLong(rpcProtocol.getTimeout());
         // 服务名长度
         byteBuf.writeInt(rpcProtocol.getServiceNameLength());
+        // 版本长度
+        byteBuf.writeInt(rpcProtocol.getVersionLength());
         // 方法名长度
         byteBuf.writeInt(rpcProtocol.getMethodNameLength());
         // 方法参数个数
         byteBuf.writeInt(rpcProtocol.getMethodParamCount());
         // 服务名
         byteBuf.writeBytes(rpcProtocol.getServiceName());
+        // 版本名
+        byteBuf.writeBytes(rpcProtocol.getVersion());
         // 方法名
         byteBuf.writeBytes(rpcProtocol.getMethodName());
         int bodyLength = 0;
@@ -86,6 +90,8 @@ public class RequestRpcProtocolCodec {
         rpcProtocol.setTimeout(timeout);
         // 服务名长
         int serviceNameLength = byteBuf.readInt();
+        // 版本名长
+        int versionLength = byteBuf.readInt();
         // 方法名长
         int methodNameLength = byteBuf.readInt();
         // 方法参数个数
@@ -95,6 +101,10 @@ public class RequestRpcProtocolCodec {
         ByteBuf serviceNameBuf = byteBuf.readBytes(serviceNameLength);
         rpcProtocol.setServiceName(ByteBufUtil.getBytes(serviceNameBuf));
         ReferenceCountUtil.release(serviceNameBuf);
+        // 版本名
+        ByteBuf versionNameBuf = byteBuf.readBytes(versionLength);
+        rpcProtocol.setVersion(ByteBufUtil.getBytes(versionNameBuf));
+        ReferenceCountUtil.release(versionNameBuf);
         // 方法名
         ByteBuf methodNameBuf = byteBuf.readBytes(methodNameLength);
         rpcProtocol.setMethodName(ByteBufUtil.getBytes(methodNameBuf));

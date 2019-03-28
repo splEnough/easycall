@@ -43,6 +43,11 @@ public class RequestRpcProtocol {
     private int serviceNameLength;
 
     /**
+     * 版本号长
+     */
+    private int versionLength;
+
+    /**
      * 方法名长
      */
     private int methodNameLength;
@@ -56,6 +61,11 @@ public class RequestRpcProtocol {
      * 服务名
      */
     private byte[] serviceName;
+
+    /**
+     * 版本名
+     */
+    private byte[] version;
 
     /**
      * 方法名
@@ -156,6 +166,23 @@ public class RequestRpcProtocol {
             return data;
         }
 
+    }
+
+    public int getVersionLength() {
+        return versionLength;
+    }
+
+    public void setVersionLength(int versionLength) {
+        this.versionLength = versionLength;
+    }
+
+    public byte[] getVersion() {
+        return version;
+    }
+
+    public void setVersion(byte[] version) {
+        this.version = version;
+        this.versionLength = version.length;
     }
 
     public long getRequestId() {

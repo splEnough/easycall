@@ -1,5 +1,7 @@
 package easycall.network.common.connection;
 
+import easycall.exception.RpcServiceNotFoundException;
+
 import java.io.Closeable;
 import java.util.concurrent.TimeUnit;
 
@@ -18,4 +20,14 @@ public interface ConnectionFactory extends Closeable{
      * @return
      */
     Connection buildConnection(String targetIp,  Integer targetPort, int timeout, TimeUnit unit) throws Exception;
+
+    /**
+     * 获取与目标服务主机的连接
+     * @param serviceName 要连接的服务名
+     * @param version 要连接的版本号
+     * @return
+     * @throws RpcServiceNotFoundException 找不到服务
+     * @throws Exception
+     */
+    Connection buildTargetServiceConnection(String serviceName, String version, Integer targetPort, int timeout, TimeUnit unit) throws Exception;
 }

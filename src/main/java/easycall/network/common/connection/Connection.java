@@ -48,4 +48,10 @@ public interface Connection extends Closeable{
      */
     void resetLastWriteTime(long timeMills);
 
+    /**
+     * 是否已经关闭
+     * @return 已经关闭返回true
+     */
+    boolean isClose();
+
 }

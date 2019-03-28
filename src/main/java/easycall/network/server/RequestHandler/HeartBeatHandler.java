@@ -5,8 +5,9 @@ import easycall.codec.packet.MessageType;
 import easycall.codec.packet.RequestPacket;
 import easycall.codec.packet.ResponsePacket;
 import easycall.codec.serializer.SerializeType;
-import easycall.exception.DataDeSerializeException;
 import easycall.exception.ResultCode;
+import easycall.config.ServerInitializer;
+import easycall.serviceconfig.server.RPCProvider;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 
@@ -23,8 +24,8 @@ public class HeartBeatHandler extends RequestHandlerBase {
 
     private static final SerializeType HEARTBEAT_SERIALIZE_TYPE = SerializeType.PROTO_STUFF;
 
-    public HeartBeatHandler(Channel channel, RequestPacket packet) {
-        super(channel, packet);
+    public HeartBeatHandler(Channel channel, RequestPacket packet, RPCProvider<?> rpcProvider, ServerInitializer serverInitializer) {
+        super(channel, packet, rpcProvider , serverInitializer);
     }
 
     @Override

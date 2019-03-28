@@ -12,12 +12,17 @@ import java.io.IOException;
 public abstract class ServerStarterAdapter implements ServerStarter {
 
     /**
-     * 供子类使用
+     * bossGroup
      */
-    protected EventLoopGroup group = new NioEventLoopGroup();
+    protected EventLoopGroup bossGroup = new NioEventLoopGroup();
+
+    protected EventLoopGroup childGroup = new NioEventLoopGroup(12);
+
+
 
     @Override
     public void close() throws IOException {
-        group.shutdownGracefully();
+        bossGroup.shutdownGracefully();
+        childGroup.shutdownGracefully();
     }
 }
