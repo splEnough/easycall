@@ -3,6 +3,7 @@ package easycall.serviceconfig.client;
 import easycall.codec.packet.RequestPacket;
 import easycall.exception.DataSerializeException;
 import easycall.exception.RpcCallResponseTimeOutException;
+import easycall.network.client.RpcResult;
 import io.netty.channel.Channel;
 
 /**
@@ -21,7 +22,7 @@ public interface RpcMessageManager {
      * @param requestId 请求的id
      * @param result 返回的实体类
      */
-    void addRpcResult(Long requestId, Object result) ;
+    void addRpcResult(Long requestId, RpcResult result) ;
 
     /**
      * 发送RPC请求，并等待RPC响应

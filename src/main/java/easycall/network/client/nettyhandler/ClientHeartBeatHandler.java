@@ -4,6 +4,7 @@ import easycall.codec.packet.MessageType;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 import easycall.network.common.connection.management.ConnectionManager;
@@ -12,6 +13,7 @@ import easycall.codec.packet.Packet;
 import easycall.codec.packet.RequestPacket;
 import easycall.codec.packet.ResponsePacket;
 import easycall.codec.serializer.SerializeType;
+import io.netty.util.ReferenceCountUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,7 @@ import java.util.concurrent.Executors;
  *
  * @author 翁富鑫 2019/3/3 16:23
  */
-public class ClientHeartBeatHandler extends SimpleChannelInboundHandler {
+public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
 
     /**
      * 持有一个连接管理器
@@ -52,15 +54,17 @@ public class ClientHeartBeatHandler extends SimpleChannelInboundHandler {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf inputByteBuf = (ByteBuf) msg;
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        // 拷贝一份数据，用于进行异步处理，不影响msg在PipeLine主干中的释放
+        ByteBuf inputByteBuf = ((ByteBuf) msg).copy();
         // 判断是否是心跳数据
         byte type = inputByteBuf.getByte(4);
         if (MessageType.getTypeByOrdinal((int) type) == MessageType.HEARTBEAT_RESPONSE) {
             // 只处理心跳
             heartBeatExecutorService.submit(() -> {
                 try {
-                    Packet packet = Framer.decode((ByteBuf) msg);
+                    Packet packet = Framer.decode(inputByteBuf);
+                    ReferenceCountUtil.release(packet);
                     if (packet instanceof RequestPacket) {
                         throw new Exception("不支持的请求类型");
                     }
@@ -71,6 +75,9 @@ public class ClientHeartBeatHandler extends SimpleChannelInboundHandler {
                     e.printStackTrace();
                 }
             });
+        } else {
+            // 非心跳数据，往PipeLine继续传输
+            super.channelRead(ctx,msg);
         }
     }
 

@@ -4,6 +4,7 @@ import easycall.codec.frame.Framer;
 import easycall.codec.packet.RequestPacket;
 import easycall.exception.DataSerializeException;
 import easycall.exception.RpcCallResponseTimeOutException;
+import easycall.network.client.RpcResult;
 import io.netty.channel.Channel;
 
 import java.util.Collections;
@@ -28,7 +29,7 @@ public class DefaultRpcMessageManager implements RpcMessageManager {
     /**
      * 保存RPC请求响应结果，key为requestId
      */
-    private Map<Long, Object> responseResultMap = new ConcurrentHashMap<>();
+    private Map<Long, RpcResult> responseResultMap = new ConcurrentHashMap<>();
 
     /**
      * 保存等待某个请求的RPC调用结果的线程，key为requestId
@@ -46,13 +47,15 @@ public class DefaultRpcMessageManager implements RpcMessageManager {
         return requestIdGenerator.addAndGet(1);
     }
 
-    // TODO result类型需要做进一步的具体化,暂时只是把功能流程实现
-    public void addRpcResult(Long requestId, Object result) {
+    public void addRpcResult(Long requestId, RpcResult result) {
         if (cleanRequestIdSet.contains(requestId)) {
             // 忽略当前的结果
             cleanRequestIdSet.remove(requestId);
         }
+        // 保存结果
         responseResultMap.put(requestId, result);
+        // 唤醒线程
+        LockSupport.unpark(this.requestWaitingThread.get(requestId));
     }
 
     public Object sendRequest(Channel channel, RequestPacket requestPacket) throws RpcCallResponseTimeOutException, DataSerializeException, Exception {
@@ -61,14 +64,14 @@ public class DefaultRpcMessageManager implements RpcMessageManager {
         // 发送请求
         channel.writeAndFlush(Framer.encode(requestPacket));
         // 返回数据
-        return get(requestPacket.getRequestId(), requestPacket.getTimeout());
+        return get(requestPacket.getRequestId(), requestPacket.getTimeout()).getResultObject();
     }
 
-    private Object get(Long requestId , Long timeOut) throws RpcCallResponseTimeOutException {
+    private RpcResult get(Long requestId , Long timeOut) throws RpcCallResponseTimeOutException {
         // 保存数等待线程的数据
         requestWaitingThread.put(requestId, Thread.currentThread());
         // 休眠当前的线程，除非被唤醒或者到达了timeout
-        LockSupport.parkNanos(timeOut * 1000);
+        LockSupport.parkNanos(timeOut * 1000000);
         // 休眠结束
         if (responseResultMap.get(requestId) == null) {
             // 超时，需要清除当前requestId
@@ -76,7 +79,10 @@ public class DefaultRpcMessageManager implements RpcMessageManager {
             throw new RpcCallResponseTimeOutException("调用超时");
         }
         // 被结果唤醒，则返回结果
-        return responseResultMap.get(requestId);
+        RpcResult rpcResult = responseResultMap.remove(requestId);
+        requestWaitingThread.remove(requestId);
+        cleanRequestIdSet.remove(requestId);
+        return rpcResult;
     }
 
 }

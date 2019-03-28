@@ -1,10 +1,10 @@
 package easycall.network.client.connection;
 
-import easycall.exception.RpcServiceNotFoundException;
 import easycall.loadbalance.LoadBalancer;
-import easycall.network.client.nettyhandler.EchoClientHandler;
+import easycall.network.client.nettyhandler.ClientResponseServiceDataHandler;
+import easycall.network.client.nettyhandler.InputDataShow;
 import easycall.network.common.connection.handler.MagicCheckHandler;
-import easycall.registercenter.RegisterCenterClient;
+import easycall.serviceconfig.client.RpcMessageManager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -19,8 +19,6 @@ import easycall.network.common.connection.ConnectionFactoryAdapter;
 import easycall.network.common.connection.DefaultTcpConnection;
 import easycall.network.common.connection.management.ConnectionManager;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
@@ -33,22 +31,24 @@ import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 public class PooledConnectionFactory extends ConnectionFactoryAdapter {
 
     // 读空闲最大30s，与服务端的读空闲时间保持相同
-    private static final int readerIdleSeconds = 5;
+    private static final int readerIdleSeconds = 30;
     // 写空闲最大25s，保证最多在心跳发送超过5秒没收到回复后会关闭Channel
-    private static final int writerIdleSeconds = 2;
+    private static final int writerIdleSeconds = 25;
     // disabled
     private static final int allIdleSeconds = 0;
 
     private ConnectionManager connectionManager;
+    private RpcMessageManager rpcMessageManager;
 
     /**
      * 负载均衡器
      */
     private LoadBalancer loadBalancer;
 
-    public PooledConnectionFactory(ConnectionManager connectionManager, LoadBalancer loadBalancer) {
+    public PooledConnectionFactory(ConnectionManager connectionManager, LoadBalancer loadBalancer, RpcMessageManager rpcMessageManager) {
         this.connectionManager = connectionManager;
         this.loadBalancer = loadBalancer;
+        this.rpcMessageManager = rpcMessageManager;
     }
 
     @Override
@@ -73,8 +73,12 @@ public class PooledConnectionFactory extends ConnectionFactoryAdapter {
                             ch.pipeline().addLast(new IdleStateHandler(readerIdleSeconds, writerIdleSeconds, allIdleSeconds));
 //                            // 处理IdleStateEvent，Channel、Connection管理Handler
 //                            ch.pipeline().addLast(new ClientChannelConnectionManageHandler(connectionManager));
+                            // 心跳处理器
                             ch.pipeline().addLast(new ClientHeartBeatHandler(connectionManager));
-                            ch.pipeline().addLast(new EchoClientHandler());
+                            ch.pipeline().addLast(new InputDataShow());
+                            // 业务数据处理器
+                            ch.pipeline().addLast(new ClientResponseServiceDataHandler(rpcMessageManager));
+//                            ch.pipeline().addLast(new EchoClientHandler());
                         }
                     })
                     .channel(NioSocketChannel.class)

@@ -32,10 +32,10 @@ public class ClientBoot implements Closeable{
         this.clientInitializer = new ClientInitializer();
         this.connectionManager = new DefaultConnectionManager();
         this.registerCenterClient = new DefaultZookeeperRegisterCenterClient(this.connString);
-        this.connectionFactory = new PooledConnectionFactory(connectionManager, LoadBalanceType.getLoadBalancerByCode(
-                ((LoadBalanceType)clientInitializer.getInitialParam("loadBalanceType")).getCode(), registerCenterClient)
-        );
         this.rpcMessageManager = new DefaultRpcMessageManager();
+        this.connectionFactory = new PooledConnectionFactory(connectionManager, LoadBalanceType.getLoadBalancerByCode(
+                ((LoadBalanceType)clientInitializer.getInitialParam("loadBalanceType")).getCode(), registerCenterClient),rpcMessageManager
+        );
         consumerProxyContainer = new DefaultRpcConsumerProxyContainer(clientInitializer, connectionFactory, rpcMessageManager);
     }
 

@@ -66,6 +66,7 @@ public class ServiceDataHandler extends RequestHandlerBase {
             error = e;
             e.printStackTrace();
         }
+        // 异常栈
         StackTraceElement[] elements = error.getStackTrace();
         for (StackTraceElement element : elements) {
             errorMessage += element.toString() + "\n";
@@ -74,6 +75,11 @@ public class ServiceDataHandler extends RequestHandlerBase {
         writeResult(errorMessage , ResultCode.UNKNOWN_ERROR.getCode());
     }
 
+    /**
+     * 写返回数据，如果本地出现了错误，那么返回的数据就是异常栈
+     * @param invokeResult
+     * @param resultCode
+     */
     private void writeResult(Object invokeResult, int resultCode) {
         String classTypeName = invokeResult.getClass().getTypeName();
         List<String> transTypeNames = new ArrayList<>();

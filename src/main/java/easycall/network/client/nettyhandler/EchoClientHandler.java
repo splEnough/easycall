@@ -5,6 +5,7 @@ import easycall.codec.packet.MessageType;
 import easycall.codec.packet.RequestPacket;
 import easycall.codec.serializer.SerializeType;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;

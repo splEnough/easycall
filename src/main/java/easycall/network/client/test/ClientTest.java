@@ -19,7 +19,7 @@ public class ClientTest {
 //        ConnectionManager connectionManager = new DefaultConnectionManager();
 //        ClientInitializer clientInitializer = new ClientInitializer();
 //
-//        ConnectionFactory factory = new PooledConnectionFactory(connectionManager, Cli);
+//        ConnectionFactory factory = new PooledConnectionFactory(connectionManager, null);
 //        Connection connection = factory.buildConnection("127.0.0.1",8888, 5,TimeUnit.SECONDS);
 //        TimeUnit.SECONDS.sleep(100);
 //        connectionManager.close();
@@ -28,7 +28,7 @@ public class ClientTest {
         ClientBoot clientBoot = new ClientBoot(connString);
         clientBoot.start();
         EchoService echoService = (EchoService)clientBoot.exportService(EchoService.class);
-        echoService.echo("msf");
+        System.out.println(echoService.echo("msf"));
 
     }
 }
