@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class RpcConsumerProxy implements InvocationHandler {
 
+    private Class<?> serviceType;
     private Connection rpcConnection;
     private String targetService;
     private String targetVersion;
@@ -30,12 +31,13 @@ public class RpcConsumerProxy implements InvocationHandler {
     private ClientInitializer clientInitializer;
     private RpcMessageManager rpcMessageManager;
 
-    public RpcConsumerProxy(ConnectionFactory connectionFactory, String targetService, String targetVersion, ClientInitializer clientInitializer, RpcMessageManager rpcMessageManager, long rpcTimeout) {
+    public RpcConsumerProxy(ConnectionFactory connectionFactory, String targetService, String targetVersion, ClientInitializer clientInitializer, RpcMessageManager rpcMessageManager, long rpcTimeout, Class<?> classType) {
         this.connectionFactory = connectionFactory;
         this.targetService = targetService;
         this.targetVersion = targetVersion;
         this.clientInitializer = clientInitializer;
         this.rpcMessageManager = rpcMessageManager;
+        this.serviceType = classType;
         this.rpcTimeout = rpcTimeout;
     }
 

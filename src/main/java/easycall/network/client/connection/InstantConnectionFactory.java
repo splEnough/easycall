@@ -34,4 +34,10 @@ public class InstantConnectionFactory extends ConnectionFactoryAdapter {
         }
     }
 
+    @Override
+    public Connection buildTargetServiceConnection(String serviceName, String version, Integer targetPort, int timeout, TimeUnit unit) throws Exception {
+
+        return null;
+    }
+
 }

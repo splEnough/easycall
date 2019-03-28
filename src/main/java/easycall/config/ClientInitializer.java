@@ -9,6 +9,7 @@ import java.util.Map;
 
 /**
  * 客户端启动加载器
+ *
  * @author 翁富鑫 2019/3/28 10:33
  */
 public class ClientInitializer {
@@ -32,26 +33,39 @@ public class ClientInitializer {
             }
         }
 
-        String typeString = System.getProperty("easycall.loadbalance.type");
+        // 负载均衡
         Integer loadBalanceTypeInt = 0;
-        try {
-            loadBalanceTypeInt = Integer.parseInt(typeString);
-        } catch (Exception e) {
-            throw e;
+        String typeString = System.getProperty("easycall.loadbalance.type");
+        if (!StringUtil.isNullOrEmpty(typeString)) {
+            try {
+                loadBalanceTypeInt = Integer.parseInt(typeString);
+            } catch (Exception e) {
+                throw e;
+            }
         }
         LoadBalanceType loadBalanceType = LoadBalanceType.getTypeByCode(loadBalanceTypeInt);
 
+
         // TODO 默认的端口绑定超时时间
 
-        // 默认3秒
-        int rpcTimeout = 3;
-        String timeoutString = System.getProperty("easycall.rpc.timeout");
-        try {
-            rpcTimeout = Integer.parseInt(timeoutString);
-        } catch (Exception e) {
-            throw e;
+
+        // 默认的serviceVersion
+        String version = System.getProperty("easycall.rpc.service.version");
+        if (StringUtil.isNullOrEmpty(version)) {
+            // 默认为1.0版本
+            version = "1.0";
         }
 
+        // 默认3秒的RPC调用超时
+        long rpcTimeout = 3000;
+        String timeoutString = System.getProperty("easycall.rpc.timeout");
+        if (!StringUtil.isNullOrEmpty(timeoutString)) {
+            try {
+                rpcTimeout = Integer.parseInt(timeoutString);
+            } catch (Exception e) {
+                throw e;
+            }
+        }
 
 
         // 序列化类型
@@ -69,10 +83,11 @@ public class ClientInitializer {
                     break;
             }
         }
-        initProperties.put("serializeType" , defaultSerializeType);
+        initProperties.put("serializeType", defaultSerializeType);
         initProperties.put("port", port);
-        initProperties.put("loadBalanceType" , loadBalanceType);
-        initProperties.put("rpcTimeout" , rpcTimeout);
+        initProperties.put("loadBalanceType", loadBalanceType);
+        initProperties.put("rpcTimeout", rpcTimeout);
+        initProperties.put("version", version);
     }
 
     public Map<String, Object> getInitProperties() {

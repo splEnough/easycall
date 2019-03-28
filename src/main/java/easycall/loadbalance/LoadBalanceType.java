@@ -1,6 +1,7 @@
 package easycall.loadbalance;
 
 import easycall.exception.UnknownConfigException;
+import easycall.registercenter.RegisterCenterClient;
 
 /**
  * 负载均衡类型
@@ -29,6 +30,15 @@ public enum LoadBalanceType {
         switch (code) {
             case 0:
                 return RANDOM;
+            default:
+                throw new UnknownConfigException("负载均衡配置错误");
+        }
+    }
+
+    public static LoadBalancer getLoadBalancerByCode(int code, RegisterCenterClient registerCenterClient) {
+        switch (code) {
+            case 0:
+                return new RandomLoadBalancer(registerCenterClient);
             default:
                 throw new UnknownConfigException("负载均衡配置错误");
         }
