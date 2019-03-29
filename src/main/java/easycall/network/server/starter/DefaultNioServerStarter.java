@@ -11,8 +11,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
-import easycall.network.server.handler.IdleChannelCloseHandler;
-import easycall.network.server.handler.RequestDataHandlerDispatcher;
+import easycall.network.server.nettyhandler.IdleChannelCloseHandler;
+import easycall.network.server.nettyhandler.RequestDataHandlerDispatcher;
 
 import java.util.concurrent.TimeUnit;
 

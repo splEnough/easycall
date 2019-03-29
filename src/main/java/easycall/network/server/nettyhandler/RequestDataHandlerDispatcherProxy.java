@@ -66,6 +66,7 @@ public class RequestDataHandlerDispatcherProxy {
                         break;
                 }
             } else {
+                System.out.println("不支持的请求类型");
                 throw new UnSupportedException("不支持的请求数据类型：" + packet.getMessageType().name());
             }
         } catch (MagicCheckException e) {
@@ -81,6 +82,7 @@ public class RequestDataHandlerDispatcherProxy {
             e.printStackTrace();
         } catch (Exception e) {
             // TODO 返回错误信息
+            e.printStackTrace();
         }
     }
 

@@ -69,7 +69,7 @@ public class ClientInitializer {
 
 
         // 序列化类型
-        SerializeType defaultSerializeType = SerializeType.PROTO_STUFF;
+        SerializeType defaultSerializeType = SerializeType.KRYO;
         if (!StringUtil.isNullOrEmpty(serializeType)) {
             switch (serializeType) {
                 case "protostuff":
