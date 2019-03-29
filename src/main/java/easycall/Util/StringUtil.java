@@ -1,5 +1,7 @@
 package easycall.Util;
 
+import org.springframework.util.StringUtils;
+
 /**
  * @author 翁富鑫 2019/3/24 16:06
  */
@@ -20,5 +22,15 @@ public class StringUtil {
             chars[0] = (char) (first + 32);
         }
         return new String(chars);
+    }
+
+    public static boolean equals(String s1, String s2) {
+        if (s1 != null) {
+            return s1.equals(s2);
+        } else if (s2 != null) {
+            return s2.equals(s1);
+        }
+        // 都为null
+        return true;
     }
 }

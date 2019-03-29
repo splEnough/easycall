@@ -1,8 +1,5 @@
 package easycall.test;
 
-import easycall.network.server.ServerBoot;
-import easycall.serviceconfig.server.RPCProvider;
-
 /**
  * @author 翁富鑫 2019/3/26 15:55
  */

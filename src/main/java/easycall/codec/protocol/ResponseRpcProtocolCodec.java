@@ -29,8 +29,10 @@ public class ResponseRpcProtocolCodec {
         byteBuf.writeLong(rpcProtocol.getRequestId());
         // 序列化类型
         byteBuf.writeByte(rpcProtocol.getSerializeType());
+        // 返回状态码
+        byteBuf.writeInt(rpcProtocol.getResultCode());
         // 返回数据类型长度
-        byteBuf.writeLong(rpcProtocol.getReturnTypeLength());
+        byteBuf.writeInt(rpcProtocol.getReturnTypeLength());
         // 返回对象长度
         byteBuf.writeInt(rpcProtocol.getBodyData().length);
         // 返回数据类型

@@ -1,7 +1,7 @@
-package easycall.network.server;
+package easycall.network.server.starter;
 
-import easycall.config.ServerInitializer;
-import easycall.network.common.connection.handler.MagicCheckHandler;
+import easycall.initconfig.ServerInitializer;
+import easycall.network.common.handler.MagicCheckHandler;
 import easycall.serviceconfig.server.RpcProviderManager;
 import easycall.thread.ExecutorManager;
 import io.netty.bootstrap.ServerBootstrap;

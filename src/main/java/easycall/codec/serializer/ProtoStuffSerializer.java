@@ -4,6 +4,8 @@ import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
 import io.protostuff.runtime.RuntimeSchema;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProtoStuffSerializer {
 
     private static Map<Class<?>, Schema<?>> cachedSchema = new ConcurrentHashMap<Class<?>, Schema<?>>();
+
+    private static Objenesis objenesis = new ObjenesisStd();
 
     private static <T> Schema<T> getSchema(Class<T> clazz) {
         Schema<T> schema = (Schema<T>) cachedSchema.get(clazz);
@@ -52,20 +56,21 @@ public class ProtoStuffSerializer {
     }
 
     /**
-     * 反序列化
+     * 反序列化 TODO 解决无无参构造的对象反序列化
      *
      * @param data 序列化后的byte[]值
      * @param clazz 反序列化后的对象
      * @return 返回的对象
      */
-    public static <T> T deSerialize(byte[] data, Class<T> clazz) {
+    public static <T> T deSerialize(byte[] data, Class<T> clazz) throws Exception{
         try {
-            T obj = clazz.newInstance();
+            T obj = objenesis.newInstance(clazz);
             Schema<T> schema = getSchema(clazz);
             ProtostuffIOUtil.mergeFrom(data, obj, schema);
             return obj;
         } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
+            e.printStackTrace();
+            throw e;
         }
     }
 

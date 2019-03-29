@@ -1,4 +1,4 @@
-package easycall.config;
+package easycall.initconfig;
 
 import easycall.codec.serializer.SerializeType;
 import easycall.loadbalance.LoadBalanceType;
@@ -69,7 +69,7 @@ public class ClientInitializer {
 
 
         // 序列化类型
-        SerializeType defaultSerializeType = SerializeType.KRYO;
+        SerializeType defaultSerializeType = SerializeType.JDK;
         if (!StringUtil.isNullOrEmpty(serializeType)) {
             switch (serializeType) {
                 case "protostuff":

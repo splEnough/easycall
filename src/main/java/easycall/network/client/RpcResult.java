@@ -11,25 +11,21 @@ public class RpcResult {
      */
     private boolean success;
     private Long requestId;
-    private Class<?> resultType;
+    private String resultType;
     /**
-     * 返回结果，如果操作成功则为返回的实体，操作失败则为返回的异常栈
+     * 返回结果，如果操作成功则为返回的实体，操作失败则为返回的异常栈（String）
      */
     private Object resultObject;
 
-    public RpcResult(Long requestId, Class<?> resultType, Object resultObject, boolean success) {
+    public RpcResult(Long requestId, String resultType, Object resultObject, boolean success) {
         this.requestId = requestId;
-        this.resultType = resultType;
         this.resultObject = resultObject;
         this.success = success;
+        this.resultType = resultType;
     }
 
     public Long getRequestId() {
         return requestId;
-    }
-
-    public Class<?> getResultType() {
-        return resultType;
     }
 
     public Object getResultObject() {
@@ -39,4 +35,9 @@ public class RpcResult {
     public boolean isSuccess() {
         return success;
     }
+
+    public String getResultType() {
+        return resultType;
+    }
+
 }

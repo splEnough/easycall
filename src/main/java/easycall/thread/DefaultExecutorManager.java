@@ -1,8 +1,8 @@
 package easycall.thread;
 
-import io.netty.channel.Channel;
-
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 
 /**
@@ -29,6 +29,11 @@ public class DefaultExecutorManager implements ExecutorManager {
 
     private ExecutorService publicRpcServiceExecutorService ;
 
+    /**
+     * RPCProvider特有的ExecutorService
+     */
+    private List<ExecutorService> providerExecutorServices = new ArrayList<>();
+
     public DefaultExecutorManager() {
         init();
     }
@@ -39,23 +44,46 @@ public class DefaultExecutorManager implements ExecutorManager {
 
     @Override
     public void submitTask(Runnable runnable) throws RejectedExecutionException{
-        publicRpcServiceExecutorService.submit(runnable);
+        try {
+            publicRpcServiceExecutorService.submit(runnable);
+        } catch (RejectedExecutionException e) {
+            // TODO dump内存
+        }
     }
 
     @Override
-    public Executor allocatePrivateExecutor(Integer corePoolSize, Integer maxPoolSize, String name) {
-        return null;
+    public ExecutorService allocatePrivateExecutor(Integer corePoolSize, Integer maxPoolSize, String name) {
+        ExecutorService executorService = new PrivateExecutorService(corePoolSize , maxPoolSize);
+        providerExecutorServices.add(executorService);
+        return executorService;
     }
 
     @Override
     public void close() throws IOException {
+        // 释放公共的线程池
         this.publicRpcServiceExecutorService.shutdown();
+        // 释放每个服务提供者私有的线程
+        if (this.providerExecutorServices != null) {
+            for (ExecutorService executorService : providerExecutorServices) {
+                if (!executorService.isShutdown()) {
+                    executorService.shutdown();
+                }
+            }
+        }
     }
 
     private class PublicExecutorService extends ThreadPoolExecutor {
 
         public PublicExecutorService() {
             super(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MICROSECONDS, workQueue);
+        }
+
+    }
+
+    private class PrivateExecutorService extends ThreadPoolExecutor {
+
+        public PrivateExecutorService(int corePoolSize, int maximumPoolSize) {
+            super(corePoolSize, maximumPoolSize, 0L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(10));
         }
     }
 }

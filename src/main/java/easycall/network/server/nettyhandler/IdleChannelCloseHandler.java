@@ -1,4 +1,4 @@
-package easycall.network.server.handler;
+package easycall.network.server.nettyhandler;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;

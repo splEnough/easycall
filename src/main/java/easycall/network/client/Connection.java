@@ -1,8 +1,10 @@
-package easycall.network.common.connection;
+package easycall.network.client;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 
 import java.io.Closeable;
+import java.util.List;
 
 /**
  * 当前主机与其他主机所建立的连接
@@ -53,5 +55,22 @@ public interface Connection extends Closeable{
      * @return 已经关闭返回true
      */
     boolean isClose();
+
+    /**
+     * 获取所有的Netty ChannelHandler
+     */
+    List<ChannelHandler> getAllChannelHandlers() ;
+
+    /**
+     * 添加一个ChannelHandler
+     * @param channelHandler
+     */
+    void addChannelHandler(ChannelHandler channelHandler) ;
+
+    /**
+     * 添加多个ChannelHandler
+     * @param channelHandlers
+     */
+    void addChannelHandlers(List<ChannelHandler> channelHandlers);
 
 }

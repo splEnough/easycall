@@ -1,6 +1,6 @@
-package easycall.network.common.connection.management;
+package easycall.network.client.management;
 
-import easycall.network.common.connection.Connection;
+import easycall.network.client.Connection;
 
 import java.io.Closeable;
 import java.util.List;
@@ -63,6 +63,6 @@ public interface ConnectionManager extends Closeable {
     /**
      * 重置指定连接的上次写数据时间
      */
-    void restConnectionLastWriteTime(String connectionId);
+    void resetConnectionLastWriteTime(String connectionId);
 
 }

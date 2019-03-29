@@ -1,8 +1,8 @@
 package easycall.serviceconfig.client;
 
-import easycall.config.ClientInitializer;
+import easycall.initconfig.ClientInitializer;
 import easycall.exception.ExportTypeException;
-import easycall.network.common.connection.ConnectionFactory;
+import easycall.network.client.ConnectionFactory;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

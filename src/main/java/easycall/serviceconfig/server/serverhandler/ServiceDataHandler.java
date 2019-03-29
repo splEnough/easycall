@@ -1,12 +1,15 @@
-package easycall.network.server.RequestHandler;
+package easycall.serviceconfig.server.serverhandler;
 
+import easycall.Util.StringUtil;
 import easycall.codec.frame.Framer;
 import easycall.codec.packet.MessageType;
+import easycall.codec.packet.NullObject;
 import easycall.codec.packet.RequestPacket;
 import easycall.codec.packet.ResponsePacket;
 import easycall.codec.serializer.SerializeType;
+import easycall.exception.DataSerializeException;
 import easycall.exception.ResultCode;
-import easycall.config.ServerInitializer;
+import easycall.initconfig.ServerInitializer;
 import easycall.serviceconfig.server.RPCProvider;
 import io.netty.channel.Channel;
 
@@ -32,21 +35,29 @@ public class ServiceDataHandler extends RequestHandlerBase {
         String methodName = requestPacket.getTargetMethod();
         // 调用的方法的参数类型
         List<String> typeNamesList = requestPacket.getObjectTypeNames();
+        // 请求的参数
+        List<Object> objects = requestPacket.getObjects();
+
         List<Class<?>> paramTypes = new ArrayList<>();
         try {
-            for (String typeName : typeNamesList) {
-                paramTypes.add(Class.forName(typeName));
+            for (int i = 0;i < typeNamesList.size();i++) {
+                if (StringUtil.equals(typeNamesList.get(i), NullObject.class.getTypeName())) {
+                    // 空对象占位，需要解析其中的真实类型
+                    String originalName = ((NullObject)objects.get(i)).getOriginalTypeName();
+                    paramTypes.add(Class.forName(originalName));
+                    // 真实的数据为null
+                    objects.set(i,null);
+                } else {
+                    paramTypes.add(Class.forName(typeNamesList.get(i)));
+                }
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        // 请求的参数
-        List<Object> objects = requestPacket.getObjects();
 
         String errorMessage = "";
         Exception error = null;
         try {
-            // TODO 验证类型转换结果
             Class[] clses = new Class[paramTypes.size()];
             for (int i = 0;i < paramTypes.size();i++) {
                 clses[i] = paramTypes.get(i);
@@ -54,6 +65,12 @@ public class ServiceDataHandler extends RequestHandlerBase {
             Method method = proxyObject.getClass().getMethod(methodName , clses);
 
             Object invokeResult = method.invoke(proxyObject , objects.toArray());
+            // 方法的返回类型
+            Class<?> returnType = method.getReturnType();
+            if (invokeResult == null) {
+                // 处理空值返回
+                invokeResult = new NullObject(returnType.getTypeName());
+            }
             writeResult(invokeResult , ResultCode.SUCCESS.getCode());
             return;
         } catch (IllegalAccessException e) {
@@ -67,11 +84,7 @@ public class ServiceDataHandler extends RequestHandlerBase {
             e.printStackTrace();
         }
         // 异常栈
-        StackTraceElement[] elements = error.getStackTrace();
-        for (StackTraceElement element : elements) {
-            errorMessage += element.toString() + "\n";
-        }
-        errorMessage += error.getLocalizedMessage();
+        errorMessage = getErrorStack(error);
         writeResult(errorMessage , ResultCode.UNKNOWN_ERROR.getCode());
     }
 
@@ -95,9 +108,43 @@ public class ServiceDataHandler extends RequestHandlerBase {
         responsePacket.setTransObjects(transObjects);
         try {
             channel.writeAndFlush(Framer.encode(responsePacket));
+        } catch (DataSerializeException e) {
+            responsePacket.setResultCode(ResultCode.SERIALIZE_ERROR.getCode());
+            transObjects.clear();
+            transObjects.add("服务端序列化数据失败");
+            transTypeNames.clear();
+            transTypeNames.add(String.class.getTypeName());
+            try {
+                channel.writeAndFlush(Framer.encode(responsePacket));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
         } catch (Exception e) {
+            responsePacket.setResultCode(ResultCode.SERIALIZE_ERROR.getCode());
+            transObjects.clear();
+            String errorMsg = getErrorStack(e);
+            transObjects.add(errorMsg);
+            transTypeNames.clear();
+            transTypeNames.add(String.class.getTypeName());
+            try {
+                channel.writeAndFlush(Framer.encode(responsePacket));
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
             e.printStackTrace();
         }
+    }
+
+    private String getErrorStack(Exception error) {
+        String errorMessage = "";
+        // 异常栈
+        StackTraceElement[] elements = error.getStackTrace();
+        for (StackTraceElement element : elements) {
+            errorMessage += element.toString() + "\n";
+        }
+        errorMessage += error.getLocalizedMessage();
+        return errorMessage;
     }
 }
 

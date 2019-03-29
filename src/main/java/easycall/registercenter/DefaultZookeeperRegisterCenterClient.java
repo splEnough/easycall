@@ -100,6 +100,7 @@ public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClien
             e.printStackTrace();
             return false;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -160,6 +161,7 @@ public class DefaultZookeeperRegisterCenterClient implements RegisterCenterClien
     @Override
     public void close() throws IOException {
         this.zkClient.close();
+        this.subNodeChangedExecutorService.shutdown();
     }
 
     private class ServicePathChildrenCacheListener implements PathChildrenCacheListener {

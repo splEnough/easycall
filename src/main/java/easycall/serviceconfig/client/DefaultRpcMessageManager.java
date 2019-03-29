@@ -41,8 +41,6 @@ public class DefaultRpcMessageManager implements RpcMessageManager {
      */
     private Set<Long> cleanRequestIdSet = Collections.synchronizedSet(new HashSet<>());
 
-    private ExecutorService managerPool ;
-
     public Long nextRequestId() {
         return requestIdGenerator.addAndGet(1);
     }
@@ -63,8 +61,13 @@ public class DefaultRpcMessageManager implements RpcMessageManager {
         requestPacket.setRequestId(nextRequestId());
         // 发送请求
         channel.writeAndFlush(Framer.encode(requestPacket));
-        // 返回数据
-        return get(requestPacket.getRequestId(), requestPacket.getTimeout()).getResultObject();
+        // 等待返回数据
+        RpcResult result = get(requestPacket.getRequestId(), requestPacket.getTimeout());
+        if (result.isSuccess()) {
+            return result.getResultObject();
+        }
+        // 失败，抛出异常
+        throw new Exception((String)result.getResultObject());
     }
 
     private RpcResult get(Long requestId , Long timeOut) throws RpcCallResponseTimeOutException {

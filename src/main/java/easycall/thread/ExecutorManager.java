@@ -1,9 +1,8 @@
 package easycall.thread;
 
-import io.netty.channel.Channel;
 
 import java.io.Closeable;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
 /**
@@ -27,6 +26,6 @@ public interface ExecutorManager extends Closeable {
      * @param name
      * @return
      */
-    Executor allocatePrivateExecutor(Integer corePoolSize , Integer maxPoolSize, String name) ;
+    ExecutorService allocatePrivateExecutor(Integer corePoolSize , Integer maxPoolSize, String name) ;
 
 }

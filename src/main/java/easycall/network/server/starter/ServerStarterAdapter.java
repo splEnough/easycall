@@ -1,4 +1,4 @@
-package easycall.network.server;
+package easycall.network.server.starter;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;

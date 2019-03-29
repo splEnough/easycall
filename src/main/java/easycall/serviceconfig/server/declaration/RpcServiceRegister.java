@@ -30,7 +30,7 @@ public class RpcServiceRegister implements ImportBeanDefinitionRegistrar {
         String version = (String) rpcServiceMetaData.get("version");
         if (StringUtil.isNullOrEmpty(version)) {
             // 默认的版本
-            version = "1.0.0";
+            version = "1.0";
         }
         String[] interfaceNames = importingClassMetadata.getInterfaceNames();
         // 为每个父接口注册一个RPCProvider

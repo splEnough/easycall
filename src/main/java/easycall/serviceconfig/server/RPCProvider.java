@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutorService;
  * T 当前RPC服务指定的接个RPC服务提供方的封装信口
  * @author 翁富鑫 2019/3/24 14:34
  */
-public class RPCProvider<T> {
+public class RPCProvider<T>{
 
     /**
      * 接口实现类的引用
@@ -34,11 +34,6 @@ public class RPCProvider<T> {
     private ExecutorService executorService;
 
     /**
-     * 提供者管理器
-     */
-    private RpcProviderManager rpcProviderManager;
-
-    /**
      * 当前服务提供方的代理类对象
      */
     private T proxyObject;
@@ -51,16 +46,7 @@ public class RPCProvider<T> {
         return proxyObject;
     }
 
-    public RPCProvider(RpcProviderManager rpcProviderManager) {
-        this.rpcProviderManager = rpcProviderManager;
-    }
-
-    public RpcProviderManager getRpcProviderManager() {
-        return rpcProviderManager;
-    }
-
-    public void setRpcProviderManager(RpcProviderManager rpcProviderManager) {
-        this.rpcProviderManager = rpcProviderManager;
+    public RPCProvider() {
     }
 
     public T getRpcServiceObject() {
@@ -103,23 +89,4 @@ public class RPCProvider<T> {
         this.executorService = executorService;
     }
 
-    /**
-     * 发布注册当前的服务
-     * @return 注册成功返回true
-     */
-    public void regist() {
-        if (this.rpcProviderManager != null) {
-            rpcProviderManager.exportProvider(this);
-        }
-    }
-
-    /**
-     * 取消注册当前服务
-     * @return 取消成功返回true
-     */
-    public void unRegist() {
-        if (this.rpcProviderManager != null) {
-            rpcProviderManager.unExportProvider(this.serviceName , this.version);
-        }
-    }
 }

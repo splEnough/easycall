@@ -1,7 +1,7 @@
-package easycall.network.server.RequestHandler;
+package easycall.serviceconfig.server.serverhandler;
 
 import easycall.codec.packet.RequestPacket;
-import easycall.config.ServerInitializer;
+import easycall.initconfig.ServerInitializer;
 import easycall.serviceconfig.server.RPCProvider;
 import io.netty.channel.Channel;
 

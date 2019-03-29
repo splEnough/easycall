@@ -1,4 +1,4 @@
-package easycall.network.common.connection;
+package easycall.network.client;
 
 import easycall.exception.RpcServiceNotFoundException;
 

@@ -3,9 +3,9 @@ package easycall.network.client.connection;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import easycall.network.common.connection.Connection;
-import easycall.network.common.connection.ConnectionFactoryAdapter;
-import easycall.network.common.connection.DefaultTcpConnection;
+import easycall.network.client.Connection;
+import easycall.network.client.ConnectionFactoryAdapter;
+import easycall.network.client.DefaultTcpConnection;
 
 import java.util.concurrent.TimeUnit;
 

@@ -7,4 +7,18 @@ import java.io.Serializable;
  * @author 翁富鑫 2019/3/9 16:36
  */
 public class NullObject implements Serializable {
+    private String originalTypeName ;
+    public NullObject(String originalTypeName) {
+        this.originalTypeName = originalTypeName;
+    }
+
+    public NullObject(){}
+
+    public void setOriginalTypeName(String originalTypeName) {
+        this.originalTypeName = originalTypeName;
+    }
+
+    public String getOriginalTypeName() {
+        return originalTypeName;
+    }
 }

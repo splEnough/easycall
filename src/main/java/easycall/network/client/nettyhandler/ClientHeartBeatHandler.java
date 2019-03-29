@@ -2,12 +2,9 @@ package easycall.network.client.nettyhandler;
 
 import easycall.codec.packet.MessageType;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
 import io.netty.handler.timeout.IdleStateEvent;
-import easycall.network.common.connection.management.ConnectionManager;
+import easycall.network.client.management.ConnectionManager;
 import easycall.codec.frame.Framer;
 import easycall.codec.packet.Packet;
 import easycall.codec.packet.RequestPacket;
@@ -15,6 +12,8 @@ import easycall.codec.packet.ResponsePacket;
 import easycall.codec.serializer.SerializeType;
 import io.netty.util.ReferenceCountUtil;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -25,7 +24,7 @@ import java.util.concurrent.Executors;
  *
  * @author 翁富鑫 2019/3/3 16:23
  */
-public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
+public class ClientHeartBeatHandler extends ChannelDuplexHandler implements Closeable {
 
     /**
      * 持有一个连接管理器
@@ -51,6 +50,16 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
 
     public ClientHeartBeatHandler(ConnectionManager connectionManager) {
         this.connectionManager = connectionManager;
+    }
+
+    @Override
+    public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+        ByteBuf byteBuf = (ByteBuf) msg;
+        if (byteBuf.getByte(4) == MessageType.SERVICE_DATA_REQUEST.ordinal()) {
+            // 重置上次写数据的时间
+            connectionManager.resetConnectionLastWriteTime(ctx.channel().id().asLongText());
+        }
+        super.write(ctx, msg, promise);
     }
 
     @Override
@@ -134,13 +143,19 @@ public class ClientHeartBeatHandler extends ChannelInboundHandlerAdapter {
     }
 
     private void handleHeartbeatResponse(ResponsePacket responsePacket) {
-        // 传输的对象
-        List<Object> objectList = responsePacket.getObjects();
-        // 对象对应的类型
-        List<String> paramTypeNames = responsePacket.getObjectTypeNames();
-        int size = objectList.size();
-        for (int i = 0; i < size; i++) {
-            System.out.println(i + ": type:" + paramTypeNames.get(i) + ",value:" + objectList.get(i));
-        }
+        // do nothing
+//        // 传输的对象
+//        List<Object> objectList = responsePacket.getObjects();
+//        // 对象对应的类型
+//        List<String> paramTypeNames = responsePacket.getObjectTypeNames();
+//        int size = objectList.size();
+//        for (int i = 0; i < size; i++) {
+//            System.out.println(i + ": type:" + paramTypeNames.get(i) + ",value:" + objectList.get(i));
+//        }
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.heartBeatExecutorService.shutdown();
     }
 }

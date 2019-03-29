@@ -1,4 +1,4 @@
-package easycall.network.server.RequestHandler;
+package easycall.serviceconfig.server.serverhandler;
 
 import easycall.codec.frame.Framer;
 import easycall.codec.packet.MessageType;
@@ -6,7 +6,7 @@ import easycall.codec.packet.RequestPacket;
 import easycall.codec.packet.ResponsePacket;
 import easycall.codec.serializer.SerializeType;
 import easycall.exception.ResultCode;
-import easycall.config.ServerInitializer;
+import easycall.initconfig.ServerInitializer;
 import easycall.serviceconfig.server.RPCProvider;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;

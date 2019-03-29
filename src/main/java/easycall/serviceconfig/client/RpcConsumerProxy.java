@@ -1,13 +1,14 @@
 package easycall.serviceconfig.client;
 
 import easycall.codec.packet.MessageType;
+import easycall.codec.packet.NullObject;
 import easycall.codec.packet.RequestPacket;
 import easycall.codec.serializer.SerializeType;
-import easycall.config.ClientInitializer;
+import easycall.initconfig.ClientInitializer;
 import easycall.exception.DataSerializeException;
 import easycall.exception.RpcCallResponseTimeOutException;
-import easycall.network.common.connection.Connection;
-import easycall.network.common.connection.ConnectionFactory;
+import easycall.network.client.Connection;
+import easycall.network.client.ConnectionFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -52,18 +53,27 @@ public class RpcConsumerProxy implements InvocationHandler {
             // 重新建立连接
             rpcConnection = this.connectionFactory.buildTargetServiceConnection(targetService , targetVersion, (Integer) clientInitializer.getInitialParam("port"), 5, TimeUnit.SECONDS);
         }
-        RequestPacket requestPacket = packageRequestParam(args , method.getName());
+        Class<?>[] methodParameterTypes = method.getParameterTypes();
+        RequestPacket requestPacket = packageRequestParam(methodParameterTypes, args , method.getName());
         Object rpcResult = rpcMessageManager.sendRequest(rpcConnection.getConnectionChannel(), requestPacket);
         return rpcResult;
     }
 
-    private RequestPacket packageRequestParam(Object[] args, String methodName) {
+    private RequestPacket packageRequestParam(Class<?>[] methodParameterTypes, Object[] args, String methodName) {
         RequestPacket requestPacket = new RequestPacket();
         List<String> requestParamTypeNames = new ArrayList<>();
-        for (Object obj : args) {
-            requestParamTypeNames.add(obj.getClass().getTypeName());
+        List<Object> transObjects = new ArrayList<>();
+        for (int i = 0 ;i < args.length;i++) {
+            if (args[i] == null) {
+                // 参数为null，封装一个空对象
+                NullObject nullObject = new NullObject(methodParameterTypes[i].getTypeName());
+                transObjects.add(nullObject);
+                requestParamTypeNames.add(nullObject.getClass().getTypeName());
+            } else {
+                requestParamTypeNames.add(methodParameterTypes[i].getTypeName());
+                transObjects.add(args[i]);
+            }
         }
-        List<Object> transObjects = new ArrayList<>(Arrays.asList(args));
         requestPacket.setTargetService(this.targetService);
         requestPacket.setTargetVersion(this.targetVersion);
         requestPacket.setMessageType(MessageType.SERVICE_DATA_REQUEST);

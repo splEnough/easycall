@@ -1,11 +1,11 @@
-package easycall.network.client;
+package easycall.boot;
 
-import easycall.config.ClientInitializer;
+import easycall.initconfig.ClientInitializer;
 import easycall.loadbalance.LoadBalanceType;
 import easycall.network.client.connection.PooledConnectionFactory;
-import easycall.network.common.connection.ConnectionFactory;
-import easycall.network.common.connection.management.ConnectionManager;
-import easycall.network.common.connection.management.DefaultConnectionManager;
+import easycall.network.client.ConnectionFactory;
+import easycall.network.client.management.ConnectionManager;
+import easycall.network.client.management.DefaultConnectionManager;
 import easycall.registercenter.DefaultZookeeperRegisterCenterClient;
 import easycall.registercenter.RegisterCenterClient;
 import easycall.serviceconfig.client.*;

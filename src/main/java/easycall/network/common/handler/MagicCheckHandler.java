@@ -1,4 +1,4 @@
-package easycall.network.common.connection.handler;
+package easycall.network.common.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;

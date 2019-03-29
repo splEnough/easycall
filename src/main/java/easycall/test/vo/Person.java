@@ -1,4 +1,4 @@
-package wfx.vo;
+package easycall.test.vo;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * @author 翁富鑫 2019/2/20 20:08
  */
-public class Person {
+public class Person implements Serializable {
     private String name ;
     private Integer age;
     private Map<String,String> params;

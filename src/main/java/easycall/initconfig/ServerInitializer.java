@@ -1,11 +1,10 @@
-package easycall.config;
+package easycall.initconfig;
 
 import easycall.codec.serializer.SerializeType;
 import io.netty.util.internal.StringUtil;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * 服务端启动加载器，主要是对运行的必要参数的检测和加载

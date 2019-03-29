@@ -1,6 +1,6 @@
-package easycall.network.common.connection.management;
+package easycall.network.client.management;
 
-import easycall.network.common.connection.Connection;
+import easycall.network.client.Connection;
 
 import java.io.IOException;
 import java.util.*;
@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 默认的连接管理器，管理客户端的连接
+ *
  * @author 翁富鑫 2019/3/1 21:21
  */
 public class DefaultConnectionManager implements ConnectionManager {
@@ -43,7 +44,7 @@ public class DefaultConnectionManager implements ConnectionManager {
     /**
      * 检测器线程
      */
-    private Thread detectorThread ;
+    private Thread detectorThread;
 
     public DefaultConnectionManager() {
         hostConnectionIdsMap = new ConcurrentHashMap<>();
@@ -122,7 +123,7 @@ public class DefaultConnectionManager implements ConnectionManager {
                 }
             }
             // 保存ChannelId和对应关系
-            idConnectionMap.put(connection.getConnectionId(),connection);
+            idConnectionMap.put(connection.getConnectionId(), connection);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,7 +156,7 @@ public class DefaultConnectionManager implements ConnectionManager {
         if (connection == null) {
             return true;
         }
-        String hostKey = getConnectionKey(connection.getTargetIp() ,connection.getTargetPort());
+        String hostKey = getConnectionKey(connection.getTargetIp(), connection.getTargetPort());
         List<String> hostConnectionIds = hostConnectionIdsMap.get(hostKey);
         // 解除主机单元与连接id的绑定
         if (hostConnectionIds != null && hostConnectionIds.size() > 0) {
@@ -165,7 +166,7 @@ public class DefaultConnectionManager implements ConnectionManager {
         idConnectionMap.remove(longChannelId);
         try {
             // 关闭连接
-            System.out.println("DefaultConnectionManager -- removeConnection() -- 关闭了连接，channelId:" + longChannelId);
+            System.out.println("DefaultConnectionManager:" + Thread.currentThread().getName() + " -- removeConnection() -- 关闭了连接，channelId:" + longChannelId);
             connection.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -174,7 +175,7 @@ public class DefaultConnectionManager implements ConnectionManager {
     }
 
     @Override
-    public void restConnectionLastWriteTime(String connectionId) {
+    public void resetConnectionLastWriteTime(String connectionId) {
         idConnectionMap.get(connectionId).resetLastWriteTime(System.currentTimeMillis());
     }
 
@@ -188,8 +189,10 @@ public class DefaultConnectionManager implements ConnectionManager {
         idConnectionMap.clear();
         // 解除主机单元与连接id的绑定
         hostConnectionIdsMap.clear();
-        // 停止空闲检测任务
-        this.detectorThread.stop();
+        if (this.detectorThread.getState() != Thread.State.TERMINATED) {
+            // 停止空闲检测任务
+            this.detectorThread.stop();
+        }
     }
 
     private String getConnectionKey(String ip, Integer port) {

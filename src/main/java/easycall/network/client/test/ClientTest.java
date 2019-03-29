@@ -1,13 +1,8 @@
 package easycall.network.client.test;
 
-import easycall.config.ClientInitializer;
-import easycall.network.client.ClientBoot;
-import easycall.network.client.connection.PooledConnectionFactory;
-import easycall.network.common.connection.Connection;
-import easycall.network.common.connection.ConnectionFactory;
-import easycall.network.common.connection.management.ConnectionManager;
-import easycall.network.common.connection.management.DefaultConnectionManager;
+import easycall.boot.ClientBoot;
 import easycall.test.EchoService;
+import easycall.test.PersonService;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +24,12 @@ public class ClientTest {
         clientBoot.start();
         EchoService echoService = (EchoService)clientBoot.exportService(EchoService.class);
         System.out.println(echoService.echo("msf"));
-
+        PersonService personService = (PersonService) clientBoot.exportService(PersonService.class);
+        System.out.println(personService.getPerson("翁富鑫" , null));
+        System.out.println(personService.print(null,  "撒旦"));
+        personService.doSomething(null, "uad");
+        TimeUnit.SECONDS.sleep(100);
+        System.out.println(personService.getPerson("翁富鑫" , 21));
+        clientBoot.close();
     }
 }
