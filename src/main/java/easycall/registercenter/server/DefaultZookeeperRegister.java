@@ -6,6 +6,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.curator.retry.RetryForever;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
@@ -61,7 +62,10 @@ public class DefaultZookeeperRegister implements Register {
      */
     private ExecutorService reConnectExecutor = Executors.newSingleThreadExecutor();
 
-    private volatile boolean isRunning = false;
+    /**
+     * 循环执行zookeeper操作，这样才能在断开连接的时候触发重连机制
+     */
+    private ExecutorService heartBeatExecutor = Executors.newSingleThreadExecutor();
 
     public DefaultZookeeperRegister(String zookeeperConnectionString) {
         this.zookeeperConnectionString = zookeeperConnectionString;
@@ -72,9 +76,20 @@ public class DefaultZookeeperRegister implements Register {
         zkClient = CuratorFrameworkFactory.builder()
                 .connectString(zookeeperConnectionString)
                 .namespace(SERVICE_PARENT_PATH)
-                .retryPolicy(new RegisterServiceRetryPolicy(RETRY_INTERVAL_MS))
+                .retryPolicy(new RetryForever(RETRY_INTERVAL_MS))
                 .build();
+        zkClient.getConnectionStateListenable().addListener(new RegistAllServices());
         zkClient.start();
+        heartBeatExecutor.submit(() -> {
+            while (true) {
+                TimeUnit.SECONDS.sleep(5);
+                try {
+                    zkClient.getData().forPath("/");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
@@ -141,68 +156,23 @@ public class DefaultZookeeperRegister implements Register {
 
         @Override
         public void stateChanged(CuratorFramework client, ConnectionState newState) {
+            System.out.println("state:" + newState);
             if (newState == ConnectionState.RECONNECTED) {
                 // 注册所有的服务
-            }
-        }
-    }
-
-    private class RegisterServiceRetryPolicy implements RetryPolicy {
-
-        private final int retryIntervalMs;
-
-        // 开启一个线程执行重新发布服务的任务
-
-        public RegisterServiceRetryPolicy(int retryIntervalMs) {
-            checkArgument(retryIntervalMs > 0);
-            this.retryIntervalMs = retryIntervalMs;
-        }
-
-        @Override
-        public boolean allowRetry(int retryCount, long elapsedTimeMs, RetrySleeper sleeper) {
-            try {
-                sleeper.sleepFor(retryIntervalMs, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return false;
-            }
-            System.out.println("true");
-            if (!isRunning) {
-                reConnectExecutor.submit(new RegistAllServiceTask());
-            }
-            return true;
-        }
-
-    }
-
-    private class RegistAllServiceTask implements Runnable {
-
-        @Override
-        public void run() {
-            isRunning = true;
-            while (zkClient.getState() != STARTED) {
-                // 客户端还没有启动
                 try {
-                    TimeUnit.MILLISECONDS.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            // 已经启动，开始重新连接
-            try {
-                for (String servicePath : registeredServicesPathSet) {
-                    Stat stat = zkClient.checkExists().creatingParentsIfNeeded().forPath(servicePath);
-                    if (stat == null) {
-                        // 还没有创建节点，则创建临时节点
-                        zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(servicePath);
+                    System.out.println("重新注册服务");
+                    for (String servicePath : registeredServicesPathSet) {
+                        Stat stat = zkClient.checkExists().creatingParentsIfNeeded().forPath(servicePath);
+                        if (stat == null) {
+                            // 还没有创建节点，则创建临时节点
+                            zkClient.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(servicePath);
+                        }
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("Republish server services failed!");
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.error("Republish server services failed!");
             }
-            System.out.println("一个runnable完毕");
-            isRunning = false;
         }
     }
 
