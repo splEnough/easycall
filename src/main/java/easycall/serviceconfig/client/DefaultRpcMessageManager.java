@@ -52,6 +52,7 @@ public class DefaultRpcMessageManager implements RpcMessageManager {
         }
         // 保存结果
         responseResultMap.put(requestId, result);
+        Thread waitThread = this.requestWaitingThread.get(requestId);
         // 唤醒线程
         LockSupport.unpark(this.requestWaitingThread.get(requestId));
     }

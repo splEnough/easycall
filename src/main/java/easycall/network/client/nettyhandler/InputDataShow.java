@@ -9,7 +9,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class InputDataShow extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("读取到了数据");
+        System.out.println("InputDataShow -- 读取到了数据");
         super.channelRead(ctx, msg);
     }
 }

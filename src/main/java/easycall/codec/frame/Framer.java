@@ -18,6 +18,9 @@ import io.netty.buffer.ByteBufUtil;
 
 import static easycall.codec.protocol.RequestRpcProtocol.ParamTypeAndValue;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,6 +94,7 @@ public class Framer {
             // 处理响应对象
             List<Object> responseObjects = packet.getObjects();
             if (responseObjects != null && responseObjects.size() > 0) {
+                // 只会返回一个对象，所以list中只有一个对象
                 for (Object o : responseObjects) {
                     // 参数类型名
                     String typeName = o.getClass().getTypeName();

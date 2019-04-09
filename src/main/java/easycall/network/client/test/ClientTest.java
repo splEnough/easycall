@@ -3,7 +3,9 @@ package easycall.network.client.test;
 import easycall.boot.ClientBoot;
 import easycall.test.EchoService;
 import easycall.test.PersonService;
+import easycall.test.vo.Person;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -22,14 +24,18 @@ public class ClientTest {
         String connString = "192.168.85.129:2181,192.168.85.130:2181,192.168.85.131:2181";
         ClientBoot clientBoot = new ClientBoot(connString);
         clientBoot.start();
-        EchoService echoService = (EchoService)clientBoot.exportService(EchoService.class);
-        System.out.println(echoService.echo("msf"));
-        PersonService personService = (PersonService) clientBoot.exportService(PersonService.class);
-        System.out.println(personService.getPerson("翁富鑫" , null));
-        System.out.println(personService.print(null,  "撒旦"));
-        personService.doSomething(null, "uad");
-        TimeUnit.SECONDS.sleep(100);
-        System.out.println(personService.getPerson("翁富鑫" , 21));
+        EchoService echoService = (EchoService)clientBoot.subscribeService(EchoService.class);
+//        System.out.println(echoService.echo("msf"));
+        PersonService personService = (PersonService) clientBoot.subscribeService(PersonService.class);
+//        System.out.println(personService.getPerson("翁富鑫" , null));
+//        System.out.println(personService.getPerson("翁富鑫" , 21));
+
+        // 返回List
+        List<Person> personList = personService.getPersonList("翁富鑫");
+        System.out.println(personList);
+        for (Person person : personList) {
+            System.out.println(person);
+        }
         clientBoot.close();
     }
 }

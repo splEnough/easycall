@@ -3,8 +3,8 @@ package easycall.boot;
 import easycall.initconfig.ServerInitializer;
 import easycall.network.server.starter.DefaultNioServerStarter;
 import easycall.network.server.starter.ServerStarter;
-import easycall.registercenter.DefaultZookeeperRegisterCenterClient;
-import easycall.registercenter.RegisterCenterClient;
+import easycall.registercenter.server.DefaultZookeeperRegister;
+import easycall.registercenter.server.Register;
 import easycall.serviceconfig.server.RpcProviderManager;
 import easycall.thread.DefaultExecutorManager;
 import easycall.thread.ExecutorManager;
@@ -22,7 +22,7 @@ public class ServerBoot implements Closeable{
     private ServerInitializer initializer ;
     private ExecutorManager executorManager;
     ServerStarter serverStarter;
-    private RegisterCenterClient registerCenterClient;
+    private Register register;
     /**
      * 服务端只能启动一次
      */
@@ -44,8 +44,8 @@ public class ServerBoot implements Closeable{
     private void init() {
         initializer = new ServerInitializer();
         executorManager = new DefaultExecutorManager();
-        registerCenterClient = new DefaultZookeeperRegisterCenterClient(connString);
-        rpcProviderManager = new RpcProviderManager(registerCenterClient);
+        register = new DefaultZookeeperRegister(connString);
+        rpcProviderManager = new RpcProviderManager(register);
         serverStarter = new DefaultNioServerStarter(initializer, executorManager, rpcProviderManager);
     }
 
@@ -56,7 +56,7 @@ public class ServerBoot implements Closeable{
         if (isStart.compareAndSet(false , true)) {
             try {
                 serverStarter.start();
-                registerCenterClient.start();
+                register.start();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -66,7 +66,7 @@ public class ServerBoot implements Closeable{
     @Override
     public void close() throws IOException {
         serverStarter.close();
-        registerCenterClient.close();
+        register.close();
         executorManager.close();
     }
 
@@ -80,10 +80,6 @@ public class ServerBoot implements Closeable{
 
     public ServerStarter getServerStarter() {
         return serverStarter;
-    }
-
-    public RegisterCenterClient getRegisterCenterClient() {
-        return registerCenterClient;
     }
 
     public AtomicBoolean getIsStart() {

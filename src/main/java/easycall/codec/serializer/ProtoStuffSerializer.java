@@ -10,8 +10,10 @@ import org.objenesis.ObjenesisStd;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -20,103 +22,96 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ProtoStuffSerializer {
 
-    private static Map<Class<?>, Schema<?>> cachedSchema = new ConcurrentHashMap<Class<?>, Schema<?>>();
-
-    private static Objenesis objenesis = new ObjenesisStd();
-
-    private static <T> Schema<T> getSchema(Class<T> clazz) {
-        Schema<T> schema = (Schema<T>) cachedSchema.get(clazz);
-        if (schema == null) {
-            schema = RuntimeSchema.getSchema(clazz);
-            if (schema != null) {
-                cachedSchema.put(clazz, schema);
-            }
-        }
-        return schema;
-    }
+    /**
+     * 线程局部变量
+     */
+    private static final ThreadLocal<LinkedBuffer> BUFFERS = new ThreadLocal();
 
     /**
-     * 序列化
-     *
-     * @param obj 序列化对象
-     * @return 序列化后的byte[]值
+     * 序列化/反序列化包装类 Schema 对象
      */
-    public static <T> byte[] serialize(T obj) {
-        @SuppressWarnings("unchecked")
-        Class<T> clazz = (Class<T>) obj.getClass();
-        LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
+    private static final Schema<SerializeDeserializeWrapper> WRAPPER_SCHEMA = RuntimeSchema.getSchema(SerializeDeserializeWrapper.class);
+
+
+    /**
+     * 序列化对象
+     *
+     * @param obj 需要序列化的对象
+     * @return 序列化后的二进制数组
+     */
+    @SuppressWarnings("unchecked")
+    public static byte[] serialize(Object obj) {
+        Class<?> clazz = obj.getClass();
+        LinkedBuffer buffer = BUFFERS.get();
+        if (buffer == null) {//存储buffer到线程局部变量中，避免每次序列化操作都分配内存提高序列化性能
+            buffer = LinkedBuffer.allocate(512);
+            BUFFERS.set(buffer);
+        }
         try {
-            Schema<T> schema = getSchema(clazz);
-            return ProtostuffIOUtil.toByteArray(obj, schema, buffer);
-        } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage(), e);
+            Object serializeObject = obj;
+            Schema schema = WRAPPER_SCHEMA;
+            if (clazz.isArray() || Collection.class.isAssignableFrom(clazz)
+                    || Map.class.isAssignableFrom(clazz) || Set.class.isAssignableFrom(clazz)) {//Protostuff 不支持序列化/反序列化数组、集合等对象,特殊处理
+                serializeObject = SerializeDeserializeWrapper.builder(obj);
+            } else {
+                schema = RuntimeSchema.getSchema(clazz);
+            }
+            return ProtostuffIOUtil.toByteArray(serializeObject, schema, buffer);
         } finally {
             buffer.clear();
         }
     }
 
     /**
-     * 反序列化 TODO 解决无无参构造的对象反序列化
+     * 反序列化对象
      *
-     * @param data 序列化后的byte[]值
-     * @param clazz 反序列化后的对象
-     * @return 返回的对象
+     * @param data 需要反序列化的二进制数组
+     * @param clazz 反序列化后的对象class
+     * @param <T> 反序列化后的对象类型
+     * @return 反序列化后的实例对象
      */
-    public static <T> T deSerialize(byte[] data, Class<T> clazz) throws Exception{
-        try {
-            T obj = objenesis.newInstance(clazz);
-            Schema<T> schema = getSchema(clazz);
-            ProtostuffIOUtil.mergeFrom(data, obj, schema);
-            return obj;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+    public static <T> T deserialize(Class<T> clazz, byte[] data) {
+        if (clazz.isArray() || Collection.class.isAssignableFrom(clazz)
+                || Map.class.isAssignableFrom(clazz) || Set.class.isAssignableFrom(clazz)) {//Protostuff 不支持序列化/反序列化数组、集合等对象,特殊处理
+            SerializeDeserializeWrapper<T> wrapper = new SerializeDeserializeWrapper<>();
+            ProtostuffIOUtil.mergeFrom(data, wrapper, WRAPPER_SCHEMA);
+            return wrapper.getData();
+        } else {
+            Schema<T> schema = RuntimeSchema.getSchema(clazz);
+            T message = schema.newMessage();
+            ProtostuffIOUtil.mergeFrom(data, message, schema);
+            return message;
         }
     }
 
+    /**
+     * <p>
+     * 序列化/反序列化对象包装类 专为基于 Protostuff 进行序列化/反序列化而定义。 Protostuff
+     * 是基于POJO进行序列化和反序列化操作。 如果需要进行序列化/反序列化的对象不知道其类型，不能进行序列化/反序列化；
+     * 比如Map、List、String、Enum等是不能进行正确的序列化/反序列化。
+     * 因此需要映入一个包装类，把这些需要序列化/反序列化的对象放到这个包装类中。 这样每次 Protostuff
+     * 都是对这个类进行序列化/反序列化,不会出现不能/不正常的操作出现
+     * </p>
+     *
+     * @author butioy
+     */
+    static class SerializeDeserializeWrapper<T> {
 
-    public static <T> byte[] serializeList(List<T> objList) {
-        if (objList == null || objList.isEmpty()) {
-            throw new RuntimeException("序列化对象列表(" + objList + ")参数异常!");
-        }
-        @SuppressWarnings("unchecked")
-        Schema<T> schema = (Schema<T>) RuntimeSchema.getSchema(objList.get(0).getClass());
-        LinkedBuffer buffer = LinkedBuffer.allocate(1024 * 1024);
-        byte[] protostuff = null;
-        ByteArrayOutputStream bos = null;
-        try {
-            bos = new ByteArrayOutputStream();
-            ProtostuffIOUtil.writeListTo(bos, objList, schema, buffer);
-            protostuff = bos.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException("序列化对象列表(" + objList + ")发生异常!", e);
-        } finally {
-            buffer.clear();
-            try {
-                if(bos!=null){
-                    bos.close();
-                }
-            } catch (IOException ignore) {
+        private T data;
 
-            }
+        public static <T> SerializeDeserializeWrapper<T> builder(T data) {
+            SerializeDeserializeWrapper<T> wrapper = new SerializeDeserializeWrapper<>();
+            wrapper.setData(data);
+            return wrapper;
         }
 
-        return protostuff;
-    }
-
-
-    public static <T> List<T> deserializeList(byte[] paramArrayOfByte, Class<T> targetClass) {
-        if (paramArrayOfByte == null || paramArrayOfByte.length == 0) {
-            throw new RuntimeException("反序列化对象发生异常,byte序列为空!");
+        public T getData() {
+            return data;
         }
 
-        Schema<T> schema = RuntimeSchema.getSchema(targetClass);
-        List<T> result;
-        try {
-            result = ProtostuffIOUtil.parseListFrom(new ByteArrayInputStream(paramArrayOfByte), schema);
-        } catch (IOException e) {
-            throw new RuntimeException("反序列化对象列表发生异常!",e);
+        public void setData(T data) {
+            this.data = data;
         }
-        return result;
+
     }
 }

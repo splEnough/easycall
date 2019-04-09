@@ -56,7 +56,7 @@ public class SerializerResolver {
                 case KRYO:
                     return KryoSerializer.deSerialize(data);
                 case PROTO_STUFF:
-                    return ProtoStuffSerializer.deSerialize(data, dataType);
+                    return ProtoStuffSerializer.deserialize(dataType , data);
                 default:
                     return JdkSerializer.deSerialize(data);
             }

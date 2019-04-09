@@ -33,7 +33,7 @@ public class JdkSerializer {
     }
 
     /**
-     * 反序列化
+     * 反序列化一个对象
      * @throws Exception
      */
     public static Object deSerialize(byte[] data) throws Exception{

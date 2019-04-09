@@ -10,6 +10,7 @@ import easycall.network.client.RpcResult;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.ReferenceCountUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,9 +33,11 @@ public class RpcResponseHandler implements Runnable{
         RpcResult rpcResult = null;
         Packet packet = null;
         try {
+            // 数据解码
             packet = Framer.decode(inputByteBuf);
             ReferenceCountUtil.release(inputByteBuf);
         } catch (DataDeSerializeException e) {
+            e.printStackTrace();
             error = e;
         } catch (Exception e) {
             error = e;
@@ -49,22 +52,22 @@ public class RpcResponseHandler implements Runnable{
             if (!(packet instanceof ResponsePacket)) {
                 // 错误包，不做处理
             } else {
-                ResponsePacket responsePacket = (ResponsePacket) packet;
-                int resultCode = responsePacket.getResultCode();
-                List<String> resultTypeNames = responsePacket.getObjectTypeNames();
-                List<Object> resultObjects = responsePacket.getObjects();
-                // 返回的数据只有一个
-                String resultType = resultTypeNames.get(0);
-                Object resultObject = resultObjects.get(0);
-                if (resultObject instanceof NullObject) {
-                    // 处理返回值为null
-
-                    // 返回类型为封装的数据
-                    resultType = ((NullObject) resultObject).getOriginalTypeName();
-                    // 真正的返回数据为Null
-                    resultObject = null;
-                }
                 try {
+                    ResponsePacket responsePacket = (ResponsePacket) packet;
+                    int resultCode = responsePacket.getResultCode();
+                    List<String> resultTypeNames = responsePacket.getObjectTypeNames();
+                    List<Object> resultObjects = responsePacket.getObjects();
+                    // 返回的数据只有一个
+                    String resultType = resultTypeNames.get(0);
+                    Object resultObject = resultObjects.get(0);
+                    if (resultObject instanceof NullObject) {
+                        // 处理返回值为null
+
+                        // 返回类型为封装的数据
+                        resultType = ((NullObject) resultObject).getOriginalTypeName();
+                        // 真正的返回数据为Null
+                        resultObject = null;
+                    }
                     if (ResultCode.SUCCESS.getCode() != resultCode) {
                         // 调用失败
                         rpcResult = new RpcResult(responsePacket.getRequestId(), resultType, resultObject, false);

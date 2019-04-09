@@ -1,6 +1,7 @@
 package easycall.serviceconfig.server;
 
 import easycall.registercenter.RegisterCenterClient;
+import easycall.registercenter.server.Register;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -20,10 +21,10 @@ public class RpcProviderManager {
     /**
      * 注册中心
      */
-    private RegisterCenterClient registerCenterClient;
+    private Register register;
 
-    public RpcProviderManager(RegisterCenterClient registerCenterClient) {
-        this.registerCenterClient = registerCenterClient;
+    public RpcProviderManager(Register register) {
+        this.register = register;
         providerMap = new HashMap<>();
     }
 
@@ -37,7 +38,7 @@ public class RpcProviderManager {
      * @param provider
      */
     public void exportProvider(RPCProvider provider) {
-        this.registerCenterClient.registerService(provider.getServiceName() , provider.getVersion());
+        this.register.registerService(provider.getServiceName() , provider.getVersion());
         String key = provider.getServiceName() + "-" + provider.getVersion();
         providerMap.put(key , provider);
     }
@@ -46,7 +47,7 @@ public class RpcProviderManager {
      * 取消发布一个服务
      */
     public void unExportProvider(String serviceName ,String version) {
-        this.registerCenterClient.unRegisterService(serviceName , version);
+        this.register.unRegisterService(serviceName , version);
         String key = serviceName + "-" + version;
         this.providerMap.remove(key);
     }

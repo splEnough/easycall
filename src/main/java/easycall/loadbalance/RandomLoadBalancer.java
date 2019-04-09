@@ -1,9 +1,8 @@
 package easycall.loadbalance;
 
-import easycall.registercenter.RegisterCenterClient;
+import easycall.registercenter.client.Subscriber;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * 随机选取一个ip
@@ -11,15 +10,16 @@ import java.util.Random;
  */
 public class RandomLoadBalancer extends LoadBalancerAdapter {
 
-    public RandomLoadBalancer(RegisterCenterClient registerCenterClient) {
-        super(registerCenterClient);
+    public RandomLoadBalancer(Subscriber subscriber) {
+        super(subscriber);
     }
 
     @Override
-    String next0(String service, String version, List<String> ipList) {
+    String next0(String service, String version, Set<String> ipSet) {
         Random random = new Random();
-        int size = ipList.size();
+        int size = ipSet.size();
         int randomIndex = random.nextInt(size);
+        List<String> ipList = new ArrayList<>(ipSet);
         return ipList.get(randomIndex);
     }
 }

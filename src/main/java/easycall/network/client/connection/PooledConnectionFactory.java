@@ -2,6 +2,7 @@ package easycall.network.client.connection;
 
 import easycall.loadbalance.LoadBalancer;
 import easycall.network.client.nettyhandler.ClientResponseServiceDataHandler;
+import easycall.network.client.nettyhandler.InputDataShow;
 import easycall.network.common.handler.MagicCheckHandler;
 import easycall.serviceconfig.client.RpcMessageManager;
 import io.netty.bootstrap.Bootstrap;
@@ -85,6 +86,8 @@ public class PooledConnectionFactory extends ConnectionFactoryAdapter {
                             ch.pipeline().addLast(idleStateHandler);
                             ch.pipeline().addLast(clientHeartBeatHandler);
                             ch.pipeline().addLast(clientResponseServiceDataHandler);
+                            // 进站数据显示，用于测试
+//                            ch.pipeline().addLast(new InputDataShow());
 
                             channelHandlers.add(lengthFieldPrepender);
                             channelHandlers.add(lengthFieldBasedFrameDecoder);

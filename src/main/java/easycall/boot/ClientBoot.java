@@ -6,8 +6,8 @@ import easycall.network.client.connection.PooledConnectionFactory;
 import easycall.network.client.ConnectionFactory;
 import easycall.network.client.management.ConnectionManager;
 import easycall.network.client.management.DefaultConnectionManager;
-import easycall.registercenter.DefaultZookeeperRegisterCenterClient;
-import easycall.registercenter.RegisterCenterClient;
+import easycall.registercenter.client.DefaultZookeeperSubscriber;
+import easycall.registercenter.client.Subscriber;
 import easycall.serviceconfig.client.*;
 
 import java.io.Closeable;
@@ -21,7 +21,7 @@ import java.lang.reflect.Proxy;
 public class ClientBoot implements Closeable{
     private ConnectionManager connectionManager;
     private ConnectionFactory connectionFactory;
-    private RegisterCenterClient registerCenterClient;
+    private Subscriber subscriber;
     private ClientInitializer clientInitializer;
     private String connString;
     private RpcConsumerProxyContainer consumerProxyContainer;
@@ -31,23 +31,23 @@ public class ClientBoot implements Closeable{
         this.connString = connString;
         this.clientInitializer = new ClientInitializer();
         this.connectionManager = new DefaultConnectionManager();
-        this.registerCenterClient = new DefaultZookeeperRegisterCenterClient(this.connString);
+        this.subscriber = new DefaultZookeeperSubscriber(this.connString);
         this.rpcMessageManager = new DefaultRpcMessageManager();
         this.connectionFactory = new PooledConnectionFactory(connectionManager, LoadBalanceType.getLoadBalancerByCode(
-                ((LoadBalanceType)clientInitializer.getInitialParam("loadBalanceType")).getCode(), registerCenterClient),rpcMessageManager
+                ((LoadBalanceType)clientInitializer.getInitialParam("loadBalanceType")).getCode(), subscriber),rpcMessageManager
         );
         consumerProxyContainer = new DefaultRpcConsumerProxyContainer(clientInitializer, connectionFactory, rpcMessageManager);
     }
 
     public void start() {
-        this.registerCenterClient.start();
+        this.subscriber.start();
     }
 
     @Override
     public void close() throws IOException {
         this.connectionFactory.close();
         this.connectionManager.close();
-        this.registerCenterClient.close();
+        this.subscriber.close();
     }
 
     public ConnectionManager getConnectionManager() {
@@ -58,16 +58,12 @@ public class ClientBoot implements Closeable{
         return connectionFactory;
     }
 
-    public RegisterCenterClient getRegisterCenterClient() {
-        return registerCenterClient;
-    }
-
     /**
      * 订阅一个服务，返回当前接口的代理实现类实例
      * @param interfaceClass 所订阅的服务对应的接口类型
      * @return 代理实现对象
      */
-    public Object exportService(Class<?> interfaceClass) {
+    public Object subscribeService(Class<?> interfaceClass) {
         return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, this.consumerProxyContainer.getProxyByInterfaceType(interfaceClass));
     }
 }
