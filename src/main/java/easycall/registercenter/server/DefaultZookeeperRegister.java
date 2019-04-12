@@ -58,11 +58,6 @@ public class DefaultZookeeperRegister implements Register {
     private Set<String> registeredServicesPathSet = Collections.synchronizedSet(new HashSet<String>());
 
     /**
-     * 重新连接之后用于注册所有现有服务的线程池
-     */
-    private ExecutorService reConnectExecutor = Executors.newSingleThreadExecutor();
-
-    /**
      * 循环执行zookeeper操作，这样才能在断开连接的时候触发重连机制
      */
     private ExecutorService heartBeatExecutor = Executors.newSingleThreadExecutor();
@@ -144,7 +139,7 @@ public class DefaultZookeeperRegister implements Register {
     public void close() throws IOException {
         this.zkClient.close();
         registeredServicesPathSet.clear();
-    }
+        heartBeatExecutor.shutdown();    }
 
     private String getCurrentHostIp() throws UnknownHostException {
         InetAddress address = InetAddress.getLocalHost();
