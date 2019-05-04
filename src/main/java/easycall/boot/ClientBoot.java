@@ -13,6 +13,7 @@ import easycall.serviceconfig.client.*;
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Proxy;
+import java.util.Map;
 
 /**
  * 客户端启动器
@@ -63,7 +64,7 @@ public class ClientBoot implements Closeable{
      * @param interfaceClass 所订阅的服务对应的接口类型
      * @return 代理实现对象
      */
-    public Object subscribeService(Class<?> interfaceClass) {
-        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, this.consumerProxyContainer.getProxyByInterfaceType(interfaceClass));
+    public Object subscribeService(Class<?> interfaceClass, Map<String, Object> paramMap) {
+        return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, this.consumerProxyContainer.getProxyByInterfaceType(interfaceClass, paramMap));
     }
 }

@@ -1,7 +1,5 @@
 package easycall.Util;
 
-import org.springframework.util.StringUtils;
-
 /**
  * @author 翁富鑫 2019/3/24 16:06
  */

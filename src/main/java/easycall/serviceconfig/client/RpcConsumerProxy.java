@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 通过 DefaultRpcConsumerProxyContainer类获取
  * RPC服务处理代理类，针对某个接口进行接口实例的动态生成
  * @author 翁富鑫 2019/3/28 10:03
  */

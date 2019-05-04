@@ -6,9 +6,14 @@
 
   <groupId>wfx</groupId>
   <artifactId>EasyCall</artifactId>
-  <version>1.0</version>
+    <packaging>pom</packaging>
+    <version>1.0</version>
+    <modules>
+        <module>easyboot</module>
+      <module>test</module>
+    </modules>
 
-  <name>EasyCall</name>
+    <name>EasyCall</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
@@ -22,6 +27,7 @@
     <spring.version>5.1.5.RELEASE</spring.version>
     <curator.version>4.0.1</curator.version>
     <zookeeper.version>3.4.12</zookeeper.version>
+    <spring.boot.version>2.0.3.RELEASE</spring.boot.version>
   </properties>
 
   <dependencies>
@@ -57,25 +63,6 @@
       <groupId>io.protostuff</groupId>
       <artifactId>protostuff-core</artifactId>
       <version>${protostuff.version}</version>
-    </dependency>
-
-    <!--spring相关-->
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-beans</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>${spring.version}</version>
     </dependency>
 
     <!--Curator客户端-->

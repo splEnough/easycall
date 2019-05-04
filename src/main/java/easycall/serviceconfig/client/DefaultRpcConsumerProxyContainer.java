@@ -50,15 +50,25 @@ public class DefaultRpcConsumerProxyContainer implements RpcConsumerProxyContain
     }
 
     @Override
-    public RpcConsumerProxy getProxyByInterfaceType(Class<?> cls) {
+    public RpcConsumerProxy getProxyByInterfaceType(Class<?> cls, Map<String, Object> paramMap) {
         if (!cls.isInterface()) {
             throw new ExportTypeException("参数必须是一个接口");
         }
         String serviceName = cls.getTypeName();
+        if (paramMap.get("serviceName") != null) {
+            serviceName = (String) paramMap.get("serviceName");
+        }
         String version = (String)clientInitializer.getInitialParam("version");
+        if (paramMap.get("version") != null) {
+            version = (String) paramMap.get("version");
+        }
         String key = key(serviceName, version);
+        long timeout = (long)clientInitializer.getInitialParam("rpcTimeout");
+        if (paramMap.get("timeout") != null) {
+            timeout = (long) paramMap.get("timeout");
+        }
         RpcConsumerProxy rpcConsumerProxy = new RpcConsumerProxy(connectionFactory, serviceName, version,
-                clientInitializer, rpcMessageManager, (long) clientInitializer.getInitialParam("rpcTimeout"), cls);
+                clientInitializer, rpcMessageManager, timeout, cls);
         consumerProxyMap.put(key, rpcConsumerProxy);
         return rpcConsumerProxy;
     }
