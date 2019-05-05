@@ -12,8 +12,9 @@ import easycall.serviceconfig.client.DefaultRpcConsumerProxyContainer;
 import easycall.serviceconfig.client.DefaultRpcMessageManager;
 import easycall.serviceconfig.client.RpcConsumerProxyContainer;
 import easycall.serviceconfig.client.RpcMessageManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,9 +24,22 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnProperty(name = "enabled" , prefix = "easycall.consumer", havingValue = "true")
+@EnableConfigurationProperties(ConsumerConfigProperties.class)
 public class ConsumerConfigAutoConfig {
-    @Autowired
-    private ConsumerConfigProperties consumerConfigProperties;
+
+    @Bean
+    public static BeanFactoryPostProcessor consumerParserPostProcessor() {
+        return new ConsumerParserPostProcessor();
+    }
+
+//    @Bean
+//    public static BeanFactoryPostProcessor simple() {
+//        return new SimpleProcessor();
+//    }
+
+    public ConsumerConfigAutoConfig() {
+        System.out.println("consumerConfigAutoConfig --- init()");
+    }
 
     @Bean
     public ClientInitializer clientInitializer() {
@@ -38,7 +52,8 @@ public class ConsumerConfigAutoConfig {
     }
 
     @Bean
-    public Subscriber subscriber() {
+    public Subscriber subscriber(ConsumerConfigProperties consumerConfigProperties) {
+        System.out.println("connString:" + consumerConfigProperties.getConnString());
         return new DefaultZookeeperSubscriber(consumerConfigProperties.getConnString());
     }
 
@@ -48,21 +63,15 @@ public class ConsumerConfigAutoConfig {
     }
 
     @Bean
-    public ConnectionFactory connectionFactory() {
+    public ConnectionFactory connectionFactory(ConsumerConfigProperties consumerConfigProperties) {
         return new PooledConnectionFactory(connectionManager(), LoadBalanceType.getLoadBalancerByCode(
-                ((LoadBalanceType)clientInitializer().getInitialParam("loadBalanceType")).getCode(), subscriber()),rpcMessageManager()
+                ((LoadBalanceType)clientInitializer().getInitialParam("loadBalanceType")).getCode(), subscriber(consumerConfigProperties)),rpcMessageManager()
         );
     }
 
     @Bean
-    public RpcConsumerProxyContainer rpcConsumerProxyContainer() {
-        return new DefaultRpcConsumerProxyContainer(clientInitializer(), connectionFactory(), rpcMessageManager());
+    public RpcConsumerProxyContainer rpcConsumerProxyContainer(ConsumerConfigProperties consumerConfigProperties) {
+        return new DefaultRpcConsumerProxyContainer(clientInitializer(), connectionFactory(consumerConfigProperties), rpcMessageManager());
     }
-
-    @Bean
-    public ConsumerParserPostProcessor consumerParserPostProcessor() {
-        return new ConsumerParserPostProcessor();
-    }
-
 
 }

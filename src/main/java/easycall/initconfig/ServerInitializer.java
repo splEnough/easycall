@@ -52,4 +52,8 @@ public class ServerInitializer {
     public Map<String, Object> getInitProperties() {
         return initProperties;
     }
+
+    public Object getInitialParam(String key) {
+        return initProperties.get(key);
+    }
 }

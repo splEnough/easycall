@@ -24,9 +24,9 @@ public class ClientTest {
         String connString = "192.168.85.129:2181,192.168.85.130:2181,192.168.85.131:2181";
         ClientBoot clientBoot = new ClientBoot(connString);
         clientBoot.start();
-        EchoService echoService = (EchoService)clientBoot.subscribeService(EchoService.class);
+        EchoService echoService = (EchoService)clientBoot.subscribeService(EchoService.class, null);
 //        System.out.println(echoService.echo("msf"));
-        PersonService personService = (PersonService) clientBoot.subscribeService(PersonService.class);
+        PersonService personService = (PersonService) clientBoot.subscribeService(PersonService.class, null);
 //        System.out.println(personService.getPerson("翁富鑫" , null));
 //        System.out.println(personService.getPerson("翁富鑫" , 21));
 

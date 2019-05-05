@@ -3,7 +3,6 @@ package wfx.consumer;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import wfx.config.Consumer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +36,7 @@ public class ConsumerBeanDefinitionBuilder {
         paramMap.put("timeout" , timeout);
         beanDefinitionBuilder.addPropertyValue("paramMap" , paramMap);
         beanDefinitionBuilder.addPropertyValue("interfaceClass", interfaceClass);
-        beanDefinitionBuilder.addPropertyValue("consumerProxyContainer", consumerProperties.getConsumerProxyContainer());
+        beanDefinitionBuilder.addPropertyReference("consumerProxyContainer", "consumerProxyContainer");
         return beanDefinitionBuilder.getBeanDefinition();
     }
 

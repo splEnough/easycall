@@ -1,8 +1,8 @@
-package wfx.config;
+package wfx.consumer;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.stereotype.Component;
+import wfx.provider.ProviderServiceBeanGeneratorSelector;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.FIELD)
 @Bean
-@Import(RpcServiceBeanGeneratorSelector.class)
+@Import(ProviderServiceBeanGeneratorSelector.class)
 public @interface Consumer {
 
     /**

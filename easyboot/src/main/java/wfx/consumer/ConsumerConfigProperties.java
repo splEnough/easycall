@@ -7,24 +7,21 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "easycall.consumer")
 public class ConsumerConfigProperties {
-    // 是否启动
-    private String enabled;
+
     // zookeeper的连接字符串
     private String connString;
+
+    public ConsumerConfigProperties() {
+        System.out.println("ConsumerConfigProperties  --- init() ");
+    }
 
     public String getConnString() {
         return connString;
     }
 
     public void setConnString(String connString) {
+        System.out.println("设置值");
         this.connString = connString;
     }
 
-    public String getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(String enabled) {
-        this.enabled = enabled;
-    }
 }

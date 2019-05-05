@@ -1,6 +1,7 @@
 package wfx.config;
 
 import org.springframework.context.annotation.Configuration;
+import wfx.consumer.Consumer;
 import wfx.service.HelloService;
 
 /**

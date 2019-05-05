@@ -1,13 +1,5 @@
 package wfx.consumer;
 
-import easycall.initconfig.ClientInitializer;
-import easycall.network.client.ConnectionFactory;
-import easycall.network.client.management.ConnectionManager;
-import easycall.registercenter.client.Subscriber;
-import easycall.serviceconfig.client.RpcConsumerProxyContainer;
-import easycall.serviceconfig.client.RpcMessageManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -16,21 +8,24 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
-import wfx.config.Consumer;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+
 /**
  * @author 翁富鑫 2019/4/29 22:21
  */
-public class ConsumerParserPostProcessor implements BeanFactoryPostProcessor, ApplicationContextAware, BeanClassLoaderAware {
+public class ConsumerParserPostProcessor implements BeanFactoryPostProcessor, ApplicationContextAware, BeanClassLoaderAware, Ordered {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConsumerParserPostProcessor.class);
+//    private static final Logger logger = LoggerFactory.getLogger(ConsumerParserPostProcessor.class);
 
     private ClassLoader classLoader;
 
@@ -70,18 +65,18 @@ public class ConsumerParserPostProcessor implements BeanFactoryPostProcessor, Ap
                         + ", please change @HSFConsumer field name.");
             }
             registry.registerBeanDefinition(beanName, beanDefinitions.get(beanName));
-            logger.info("registered HSFConsumerBean \"{}\" in spring context.", beanName);
+//            logger.info("registered HSFConsumerBean \"{}\" in spring context.", beanName);
         }
     }
 
     private ConsumerProperties bindConsumerProperties(ConfigurableListableBeanFactory beanFactory) {
         ConsumerProperties consumerProperties = new ConsumerProperties();
-        consumerProperties.setSubscriber((Subscriber) beanFactory.getBean("subscriber"));
-        consumerProperties.setClientInitializer((ClientInitializer) beanFactory.getBean("clientInitializer"));
-        consumerProperties.setConnectionFactory((ConnectionFactory) beanFactory.getBean("connectionManager"));
-        consumerProperties.setRpcMessageManager((RpcMessageManager) beanFactory.getBean("rpcMessageManager"));
-        consumerProperties.setConsumerProxyContainer((RpcConsumerProxyContainer)beanFactory.getBean("rpcConsumerProxyContainer"));
-        consumerProperties.setConnectionManager((ConnectionManager) beanFactory.getBean("connectionManager"));
+        consumerProperties.setSubscriber(beanFactory.getBeanDefinition("subscriber"));
+        consumerProperties.setClientInitializer(beanFactory.getBeanDefinition("clientInitializer"));
+        consumerProperties.setConnectionFactory(beanFactory.getBeanDefinition("connectionFactory"));
+        consumerProperties.setRpcMessageManager(beanFactory.getBeanDefinition("rpcMessageManager"));
+        consumerProperties.setConsumerProxyContainer(beanFactory.getBeanDefinition("rpcConsumerProxyContainer"));
+        consumerProperties.setConnectionManager( beanFactory.getBeanDefinition("connectionManager"));
         return consumerProperties;
     }
 
@@ -105,5 +100,10 @@ public class ConsumerParserPostProcessor implements BeanFactoryPostProcessor, Ap
     @Override
     public void setBeanClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
+    }
+
+    @Override
+    public int getOrder() {
+        return Integer.MAX_VALUE;
     }
 }

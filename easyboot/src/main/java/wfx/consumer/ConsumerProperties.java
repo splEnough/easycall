@@ -1,11 +1,6 @@
 package wfx.consumer;
 
-import easycall.initconfig.ClientInitializer;
-import easycall.network.client.ConnectionFactory;
-import easycall.network.client.management.ConnectionManager;
-import easycall.registercenter.client.Subscriber;
-import easycall.serviceconfig.client.RpcConsumerProxyContainer;
-import easycall.serviceconfig.client.RpcMessageManager;
+import org.springframework.beans.factory.config.BeanDefinition;
 
 /**
  * 初始化RpcConsumerProxy需要的参数
@@ -30,12 +25,12 @@ public class ConsumerProperties {
      */
     private long timeout;
 
-    private ConnectionManager connectionManager;
-    private ConnectionFactory connectionFactory;
-    private Subscriber subscriber;
-    private ClientInitializer clientInitializer;
-    private RpcConsumerProxyContainer consumerProxyContainer;
-    private RpcMessageManager rpcMessageManager;
+    private BeanDefinition connectionManager;
+    private BeanDefinition connectionFactory;
+    private BeanDefinition subscriber;
+    private BeanDefinition clientInitializer;
+    private BeanDefinition consumerProxyContainer;
+    private BeanDefinition rpcMessageManager;
 
     public String getTargetService() {
         return targetService;
@@ -69,51 +64,51 @@ public class ConsumerProperties {
         this.timeout = timeout;
     }
 
-    public ConnectionManager getConnectionManager() {
+    public BeanDefinition getConnectionManager() {
         return connectionManager;
     }
 
-    public void setConnectionManager(ConnectionManager connectionManager) {
+    public void setConnectionManager(BeanDefinition connectionManager) {
         this.connectionManager = connectionManager;
     }
 
-    public ConnectionFactory getConnectionFactory() {
+    public BeanDefinition getConnectionFactory() {
         return connectionFactory;
     }
 
-    public void setConnectionFactory(ConnectionFactory connectionFactory) {
+    public void setConnectionFactory(BeanDefinition connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
 
-    public Subscriber getSubscriber() {
+    public BeanDefinition getSubscriber() {
         return subscriber;
     }
 
-    public void setSubscriber(Subscriber subscriber) {
+    public void setSubscriber(BeanDefinition subscriber) {
         this.subscriber = subscriber;
     }
 
-    public ClientInitializer getClientInitializer() {
+    public BeanDefinition getClientInitializer() {
         return clientInitializer;
     }
 
-    public void setClientInitializer(ClientInitializer clientInitializer) {
+    public void setClientInitializer(BeanDefinition clientInitializer) {
         this.clientInitializer = clientInitializer;
     }
 
-    public RpcConsumerProxyContainer getConsumerProxyContainer() {
+    public BeanDefinition getConsumerProxyContainer() {
         return consumerProxyContainer;
     }
 
-    public void setConsumerProxyContainer(RpcConsumerProxyContainer consumerProxyContainer) {
+    public void setConsumerProxyContainer(BeanDefinition consumerProxyContainer) {
         this.consumerProxyContainer = consumerProxyContainer;
     }
 
-    public RpcMessageManager getRpcMessageManager() {
+    public BeanDefinition getRpcMessageManager() {
         return rpcMessageManager;
     }
 
-    public void setRpcMessageManager(RpcMessageManager rpcMessageManager) {
+    public void setRpcMessageManager(BeanDefinition rpcMessageManager) {
         this.rpcMessageManager = rpcMessageManager;
     }
 }
