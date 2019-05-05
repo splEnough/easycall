@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
@@ -12,6 +14,7 @@ import java.lang.annotation.Target;
 @Component
 @Target(ElementType.TYPE)
 @Import(ProviderServiceBeanGeneratorSelector.class)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Provider {
     /**
      * 对应的服务接口

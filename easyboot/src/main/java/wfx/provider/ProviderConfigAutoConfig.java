@@ -26,7 +26,7 @@ public class ProviderConfigAutoConfig {
     }
 
     @Bean
-    public ServerInitializer clientInitializer() {
+    public ServerInitializer serverInitializer() {
         return new ServerInitializer();
     }
 

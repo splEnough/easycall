@@ -1,8 +1,14 @@
 package wfx.consumer;
 
+import easycall.registercenter.client.Subscriber;
 import easycall.serviceconfig.client.DefaultRpcConsumerProxyContainer;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.lang.Nullable;
 
 import java.lang.reflect.Proxy;
@@ -12,11 +18,12 @@ import java.util.Map;
  * 封装RpcConsumerProxy对象，在Spring的生命周期中对RpcConsumer进行操作
  * @author 翁富鑫 2019/4/29 22:40
  */
-public class ConsumerSpringBean implements FactoryBean, InitializingBean {
+public class ConsumerSpringBean implements FactoryBean, InitializingBean, ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
     private DefaultRpcConsumerProxyContainer consumerProxyContainer;
     private Class<?> interfaceClass;
     private Map<String,Object> paramMap;
+    private ApplicationContext applicationContext;
 
     @Nullable
     @Override
@@ -63,5 +70,15 @@ public class ConsumerSpringBean implements FactoryBean, InitializingBean {
 
     public void setParamMap(Map<String, Object> paramMap) {
         this.paramMap = paramMap;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        ((Subscriber)applicationContext.getBean("subscriber")).start();
     }
 }

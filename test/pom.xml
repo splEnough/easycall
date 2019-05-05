@@ -7,6 +7,7 @@
         <groupId>wfx</groupId>
         <version>1.0</version>
     </parent>
+    <packaging>jar</packaging>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>test</artifactId>
@@ -26,6 +27,11 @@
         <dependency>
             <groupId>wfx</groupId>
             <artifactId>easy-boot</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>wfx</groupId>
+            <artifactId>api</artifactId>
             <version>1.0</version>
         </dependency>
         <dependency>

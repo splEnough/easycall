@@ -1,2 +1,8 @@
 server:
-  port: 8080
+  port: 80
+easycall:
+  consumer:
+    enabled: true
+    connString: 192.168.85.129:2181,192.168.85.130:2181,192.168.85.131:2181
+  provider:
+    connString: 192.168.85.129:2181,192.168.85.130:2181,192.168.85.131:2181

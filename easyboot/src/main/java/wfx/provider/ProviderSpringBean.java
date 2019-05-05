@@ -1,6 +1,7 @@
 package wfx.provider;
 
 import easycall.initconfig.ServerInitializer;
+import easycall.registercenter.server.Register;
 import easycall.serviceconfig.server.RPCProvider;
 import easycall.serviceconfig.server.RpcProviderManager;
 import easycall.thread.ExecutorManager;
@@ -94,6 +95,7 @@ public class ProviderSpringBean<T> implements ApplicationListener<ContextRefresh
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        ((Register)applicationContext.getBean("register")).start();
         rpcProvider.setRpcServiceObject(targetServiceImpl);
         // 对外发布服务
         rpcProviderManager.exportProvider(rpcProvider);
@@ -102,7 +104,8 @@ public class ProviderSpringBean<T> implements ApplicationListener<ContextRefresh
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-        this.targetServiceImpl = (T)applicationContext.getBean("targetBeanName");
+        System.out.println("targetBeanName:" + targetBeanName);
+        this.targetServiceImpl = (T)applicationContext.getBean(targetBeanName);
         this.rpcProviderManager = (RpcProviderManager) applicationContext.getBean("rpcProviderManager");
         if (this.version == null) {
             version = (String)((ServerInitializer)applicationContext.getBean("serverInitializer")).getInitialParam("version");

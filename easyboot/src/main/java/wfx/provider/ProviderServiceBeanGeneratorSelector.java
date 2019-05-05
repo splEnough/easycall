@@ -27,7 +27,6 @@ public class ProviderServiceBeanGeneratorSelector implements ImportBeanDefinitio
         try {
             targetClass = this.classLoader.loadClass(className);
             Provider provider = AnnotationUtils.findAnnotation(targetClass, Provider.class);
-            System.out.println("annotation.version:" + provider.version());
             ProviderBeanDefinitionBuilder beanDefinitionBuilder = new ProviderBeanDefinitionBuilder(targetClassBeanName, provider, proxyBeanName);
             BeanDefinition beanDefinition = beanDefinitionBuilder.build(registry);
             if (beanDefinition != null) {
