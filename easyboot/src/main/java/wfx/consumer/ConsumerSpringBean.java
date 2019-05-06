@@ -79,6 +79,7 @@ public class ConsumerSpringBean implements FactoryBean, InitializingBean, Applic
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        // 启动订阅端
         ((Subscriber)applicationContext.getBean("subscriber")).start();
     }
 }

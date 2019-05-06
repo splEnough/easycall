@@ -76,6 +76,7 @@ public class DefaultZookeeperSubscriber implements Subscriber {
     @Override
     public Set<String> subscribeService(String serviceName, String version) {
         String serviceVersionPath = "/" + serviceName + "/" + version;
+        System.out.println("DefaultZookeeperSubscriber --- subscribe:" + serviceVersionPath);
         try {
             // 直接从Map中获取
             Set<String> currentIpSet = serviceVersionIpsSetMap.get(serviceVersionPath);

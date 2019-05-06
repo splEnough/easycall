@@ -13,6 +13,7 @@
         <module>easyboot</module>
         <module>test</module>
         <module>api</module>
+        <module>providertest</module>
     </modules>
     <!--<modules>-->
     <!--</modules>-->

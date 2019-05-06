@@ -29,9 +29,11 @@ public class ProviderBeanDefinitionBuilder {
         RPCProvider rpcProvider = new RPCProvider();
         String serviceName = annotation.interfaceClass().getTypeName();
         rpcProvider.setServiceName(serviceName);
+        rpcProvider.setVersion(annotation.version());
         // 处理Bean参数
         beanDefinitionBuilder.addPropertyValue("targetBeanName" , targetBeanName);
         beanDefinitionBuilder.addPropertyValue("rpcProvider", rpcProvider);
+        System.out.println("version:" + annotation.version());
         beanDefinitionBuilder.addPropertyValue("version" , annotation.version());
         beanDefinitionBuilder.addPropertyValue("threadPoolSize" , annotation.threadPoolSize());
         beanDefinitionBuilder.addPropertyValue("proxyBeanName" , proxyBeanName);

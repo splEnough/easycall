@@ -36,7 +36,7 @@ public class ConsumerBeanDefinitionBuilder {
         paramMap.put("timeout" , timeout);
         beanDefinitionBuilder.addPropertyValue("paramMap" , paramMap);
         beanDefinitionBuilder.addPropertyValue("interfaceClass", interfaceClass);
-        beanDefinitionBuilder.addPropertyReference("consumerProxyContainer", "consumerProxyContainer");
+        beanDefinitionBuilder.addPropertyReference("consumerProxyContainer", "rpcConsumerProxyContainer");
         return beanDefinitionBuilder.getBeanDefinition();
     }
 

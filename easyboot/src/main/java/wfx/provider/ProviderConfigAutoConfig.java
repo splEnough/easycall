@@ -8,6 +8,7 @@ import easycall.registercenter.server.Register;
 import easycall.serviceconfig.server.RpcProviderManager;
 import easycall.thread.DefaultExecutorManager;
 import easycall.thread.ExecutorManager;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties(ProviderConfigProperties.class)
+@ConditionalOnProperty(prefix = "easycall.provider", name = "enabled", havingValue = "true")
 public class ProviderConfigAutoConfig {
 
     @Bean

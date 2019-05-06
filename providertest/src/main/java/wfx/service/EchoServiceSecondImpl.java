@@ -1,5 +1,6 @@
 package wfx.service;
 
+
 import wfx.provider.Provider;
 
 /**
@@ -9,6 +10,6 @@ import wfx.provider.Provider;
 public class EchoServiceSecondImpl implements EchoServiceSecond {
     @Override
     public String echo(String msg) {
-        return "EchoServiceSecondImpl --- echo:" + msg;
+        return "EchoServiceSecondImpl --- " + Thread.currentThread().getName() + " echo:" + msg;
     }
 }

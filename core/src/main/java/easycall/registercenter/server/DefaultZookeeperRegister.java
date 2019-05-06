@@ -84,6 +84,7 @@ public class DefaultZookeeperRegister implements Register {
 
     @Override
     public boolean registerService(String serviceName, String version, String ip) {
+        System.out.println("DefaultZookeeperRegister --- registerService:serviceName" + serviceName + ",version:" + version + ",ip:" + ip);
         String ipNodePath = "/" + serviceName + "/" + version + "/" + ip;
         try {
             Stat stat = zkClient.checkExists().creatingParentsIfNeeded().forPath(ipNodePath);
