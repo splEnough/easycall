@@ -40,6 +40,11 @@
             <version>${spring.boot.version}</version>
         </dependency>
         <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+            <!--<version>${spring.boot.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
         <!--<groupId>org.springframework.boot</groupId>-->
         <!--<artifactId>spring-boot-starter-parent</artifactId>-->
         <!--<version>${spring.boot.version}</version>-->
@@ -50,12 +55,63 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <fork>true</fork>
                     <mainClass>wfx.ProviderTest</mainClass>
+                    <layout>ZIP</layout>
+
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <!-- 分离出代码包
+                        <configuration>
+                            <classifier>exec</classifier>
+                        </configuration>
+                         -->
+                    </execution>
+                </executions>
             </plugin>
+
+
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-assembly-plugin</artifactId>-->
+                <!--<configuration>-->
+                    <!--<appendAssemblyId>false</appendAssemblyId>-->
+                    <!--<descriptorRefs>-->
+                        <!--<descriptorRef>jar-with-dependencies</descriptorRef>-->
+                    <!--</descriptorRefs>-->
+                    <!--<archive>-->
+                        <!--<manifest>-->
+                            <!--&lt;!&ndash; 此处指定main方法入口的class &ndash;&gt;-->
+                            <!--<mainClass>wfx.ProviderTest</mainClass>-->
+                        <!--</manifest>-->
+                    <!--</archive>-->
+                    <!--</configuration>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>make-assembly</id>-->
+                        <!--<phase>package</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>assembly</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 
