@@ -15,6 +15,7 @@ import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 
@@ -52,35 +53,39 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
         this.rpcProviderManager = rpcProviderManager;
     }
 
+    AtomicBoolean started = new AtomicBoolean();
+
     @Override
     public void start() throws Exception{
-        ServerBootstrap serverBootstrap = new ServerBootstrap();
-        serverBootstrap.group(super.bossGroup,super.childGroup)
-                .localAddress(port)
-                .option(CONNECT_TIMEOUT_MILLIS, Long.valueOf(TimeUnit.SECONDS.toMillis(bindTimeout)).intValue())
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) throws Exception {
-                        // 写出数据编码器
-                        ch.pipeline().addLast(new LengthFieldPrepender(4));
-                        // 数据解码器
-                        ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1048576,0,4,0,4));
-                        // 魔数校验器
-                        ch.pipeline().addLast(new MagicCheckHandler());
-                        // 空闲检测
-                        ch.pipeline().addLast(new IdleStateHandler(readerIdleSeconds,writerIdleSeconds,allIdleSeconds));
-                        // 关闭空闲连接
-                        ch.pipeline().addLast(new IdleChannelCloseHandler());
-                        // 请求数据处理器
-                        ch.pipeline().addLast(new RequestDataHandlerDispatcher(executorManager, rpcProviderManager ,serverInitializer));
-                    }
-                });
-        try {
-            serverBootstrap.bind().sync();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
+        if (started.compareAndSet(false , true)) {
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            serverBootstrap.group(super.bossGroup, super.childGroup)
+                    .localAddress(port)
+                    .option(CONNECT_TIMEOUT_MILLIS, Long.valueOf(TimeUnit.SECONDS.toMillis(bindTimeout)).intValue())
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
+                            // 写出数据编码器
+                            ch.pipeline().addLast(new LengthFieldPrepender(4));
+                            // 数据解码器
+                            ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(1048576, 0, 4, 0, 4));
+                            // 魔数校验器
+                            ch.pipeline().addLast(new MagicCheckHandler());
+                            // 空闲检测
+                            ch.pipeline().addLast(new IdleStateHandler(readerIdleSeconds, writerIdleSeconds, allIdleSeconds));
+                            // 关闭空闲连接
+                            ch.pipeline().addLast(new IdleChannelCloseHandler());
+                            // 请求数据处理器
+                            ch.pipeline().addLast(new RequestDataHandlerDispatcher(executorManager, rpcProviderManager, serverInitializer));
+                        }
+                    });
+            try {
+                serverBootstrap.bind().sync();
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw e;
+            }
         }
     }
 

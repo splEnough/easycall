@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author 翁富鑫 2019/4/9 16:17
@@ -59,18 +60,23 @@ public class DefaultZookeeperSubscriber implements Subscriber {
      */
     private List<PathChildrenCache> pathChildrenCaches = new CopyOnWriteArrayList<>();
 
+    private AtomicBoolean started = new AtomicBoolean();
+
     public DefaultZookeeperSubscriber(String zookeeperConnectionString) {
         this.zookeeperConnectionString = zookeeperConnectionString;
+        start();
     }
 
     public void start() {
-        zkClient = CuratorFrameworkFactory.builder()
-                .connectString(zookeeperConnectionString)
-                .namespace(SERVICE_PARENT_PATH)
-                // TODO 重连之后要继续开启监听
-                .retryPolicy(new RetryForever(RETRY_INTERVAL_MS))
-                .build();
-        zkClient.start();
+        if (started.compareAndSet(false, true)) {
+            zkClient = CuratorFrameworkFactory.builder()
+                    .connectString(zookeeperConnectionString)
+                    .namespace(SERVICE_PARENT_PATH)
+                    // TODO 重连之后要继续开启监听
+                    .retryPolicy(new RetryForever(RETRY_INTERVAL_MS))
+                    .build();
+            zkClient.start();
+        }
     }
 
     @Override

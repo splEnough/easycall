@@ -25,7 +25,6 @@ public interface Packet {
     List<Object> getObjects();
 
     /**
-     * TODO 某个参数传递null数据则默认填充一个Null对象，在接受方进行Null对象的特殊处理
      * 获取传输对象所一一对应的类型名
      */
     List<String> getObjectTypeNames();

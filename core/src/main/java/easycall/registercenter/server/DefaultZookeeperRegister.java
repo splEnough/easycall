@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author 翁富鑫 2019/4/9 16:28
@@ -61,25 +62,29 @@ public class DefaultZookeeperRegister implements Register {
         this.zookeeperConnectionString = zookeeperConnectionString;
     }
 
+    AtomicBoolean started = new AtomicBoolean();
+
     @Override
     public void start() {
-        zkClient = CuratorFrameworkFactory.builder()
-                .connectString(zookeeperConnectionString)
-                .namespace(SERVICE_PARENT_PATH)
-                .retryPolicy(new RetryForever(RETRY_INTERVAL_MS))
-                .build();
-        zkClient.getConnectionStateListenable().addListener(new RegistAllServices());
-        zkClient.start();
-        heartBeatExecutor.submit(() -> {
-            while (true) {
-                TimeUnit.SECONDS.sleep(5);
-                try {
-                    zkClient.getData().forPath("/");
-                } catch (Exception e) {
-                    e.printStackTrace();
+        if (started.compareAndSet(false, true)) {
+            zkClient = CuratorFrameworkFactory.builder()
+                    .connectString(zookeeperConnectionString)
+                    .namespace(SERVICE_PARENT_PATH)
+                    .retryPolicy(new RetryForever(RETRY_INTERVAL_MS))
+                    .build();
+            zkClient.getConnectionStateListenable().addListener(new RegistAllServices());
+            zkClient.start();
+            heartBeatExecutor.submit(() -> {
+                while (true) {
+                    TimeUnit.SECONDS.sleep(5);
+                    try {
+                        zkClient.getData().forPath("/");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override

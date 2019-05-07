@@ -46,9 +46,6 @@ public class ClientInitializer {
         LoadBalanceType loadBalanceType = LoadBalanceType.getTypeByCode(loadBalanceTypeInt);
 
 
-        // TODO 默认的端口绑定超时时间
-
-
         // 默认的serviceVersion
         String version = System.getProperty("easycall.rpc.service.version");
         if (StringUtil.isNullOrEmpty(version)) {
