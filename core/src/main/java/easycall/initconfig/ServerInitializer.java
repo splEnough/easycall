@@ -12,25 +12,35 @@ import java.util.Map;
  */
 public class ServerInitializer {
 
-    private Map<String, Object> initProperties = new HashMap<>();
-
     public ServerInitializer() {
         init();
     }
 
+    private Integer port = 8888;
+    private SerializeType serializeType = SerializeType.PROTO_STUFF;
+    private String connString;
+    // 服务的版本号，统一设置
+    private String version;
+
     private void init() {
         // 默认的端口号
-        Integer port = 8888;
-        String portString = System.getProperty("easycall.server.port");
-        String serializeType = System.getProperty("serialize.type.name");
+        String portString = System.getProperty("easycall.provider.port");
+        String serializeType = System.getProperty("easycall.provider.type");
+        String connString = System.getProperty("easycall.provider.connString");
+        String version = System.getProperty("easycall.provider.version");
         if (!StringUtil.isNullOrEmpty(portString)) {
             try {
-                port = Integer.parseInt(portString);
+                this.port = Integer.parseInt(portString);
             } catch (Exception e) {
                 throw e;
             }
         }
+        this.serializeType = getSerializeType(serializeType);
+        this.connString = connString;
+        this.version = version;
+    }
 
+    public SerializeType getSerializeType(String serializeType) {
         SerializeType defaultSerializeType = SerializeType.PROTO_STUFF;
         if (!StringUtil.isNullOrEmpty(serializeType)) {
             switch (serializeType) {
@@ -45,15 +55,42 @@ public class ServerInitializer {
                     break;
             }
         }
-        initProperties.put("serializeType" , defaultSerializeType);
-        initProperties.put("port", port);
+        return defaultSerializeType;
     }
 
-    public Map<String, Object> getInitProperties() {
-        return initProperties;
+    public String getVersion() {
+        return version;
     }
 
-    public Object getInitialParam(String key) {
-        return initProperties.get(key);
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public void setSerializeType(SerializeType serializeType) {
+        this.serializeType = serializeType;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    public SerializeType getSerializeType() {
+        return serializeType;
+    }
+
+    public void setSerializeType(String serializeType) {
+        this.serializeType = getSerializeType(serializeType);
+    }
+
+    public String getConnString() {
+        return connString;
+    }
+
+    public void setConnString(String connString) {
+        this.connString = connString;
     }
 }

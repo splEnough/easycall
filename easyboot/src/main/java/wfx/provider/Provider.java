@@ -21,10 +21,9 @@ public @interface Provider {
      */
     Class<?> interfaceClass();
 
-    // TODO version的默认值应该是从公共的配置中获取到
     String version() default "1.0";
 
-    /**`
+    /**
      * 私有线程池的线程熟量，默认-1则表示不分配线程池
      */
     int threadPoolSize() default -1;

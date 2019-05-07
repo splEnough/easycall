@@ -1,5 +1,6 @@
 package wfx.provider;
 
+import easycall.Util.StringUtil;
 import easycall.initconfig.ServerInitializer;
 import easycall.network.server.starter.DefaultNioServerStarter;
 import easycall.network.server.starter.ServerStarter;
@@ -28,13 +29,23 @@ public class ProviderConfigAutoConfig {
     }
 
     @Bean
-    public ServerInitializer serverInitializer() {
-        return new ServerInitializer();
+    public ServerInitializer serverInitializer(ProviderConfigProperties providerConfigProperties) {
+        ServerInitializer serverInitializer = new ServerInitializer();
+        if (!StringUtil.isEmpty(providerConfigProperties.getPort())) {
+            serverInitializer.setPort(Integer.parseInt(providerConfigProperties.getPort()));
+        }
+        if (!StringUtil.isEmpty(providerConfigProperties.getConnString())) {
+            serverInitializer.setConnString(providerConfigProperties.getConnString());
+        }
+        if (!StringUtil.isEmpty(providerConfigProperties.getSerialize())) {
+            serverInitializer.setSerializeType(providerConfigProperties.getSerialize());
+        }
+        return serverInitializer;
     }
 
     @Bean
-    public Register register(ProviderConfigProperties providerConfigProperties) {
-        return new DefaultZookeeperRegister(providerConfigProperties.getConnString());
+    public Register register(ServerInitializer serverInitializer) {
+        return new DefaultZookeeperRegister(serverInitializer.getConnString());
     }
 
     @Bean

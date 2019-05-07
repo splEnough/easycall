@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 通过 DefaultRpcConsumerProxyContainer类获取
  * RPC服务处理代理类，针对某个接口进行接口实例的动态生成
+ *
  * @author 翁富鑫 2019/3/28 10:03
  */
 public class RpcConsumerProxy implements InvocationHandler {
@@ -44,17 +45,15 @@ public class RpcConsumerProxy implements InvocationHandler {
 
     /**
      * @throws RpcCallResponseTimeOutException 响应数据超时
-     * @throws DataSerializeException RPC请求数据序列化异常
-     * @throws InterruptedException 中断异常
+     * @throws DataSerializeException          RPC请求数据序列化异常
+     * @throws InterruptedException            中断异常
      */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (rpcConnection == null || rpcConnection.isClose()) {
-            // 重新建立连接
-            rpcConnection = this.connectionFactory.buildTargetServiceConnection(targetService , targetVersion, (Integer) clientInitializer.getInitialParam("port"), 5, TimeUnit.SECONDS);
-        }
+        // 重新建立连接，否则的话会一直使用同一个连接
+        rpcConnection = this.connectionFactory.buildTargetServiceConnection(targetService, targetVersion, (Integer) clientInitializer.getInitialParam("port"), 5, TimeUnit.SECONDS);
         Class<?>[] methodParameterTypes = method.getParameterTypes();
-        RequestPacket requestPacket = packageRequestParam(methodParameterTypes, args , method.getName());
+        RequestPacket requestPacket = packageRequestParam(methodParameterTypes, args, method.getName());
         Object rpcResult = rpcMessageManager.sendRequest(rpcConnection.getConnectionChannel(), requestPacket);
         return rpcResult;
     }
@@ -63,7 +62,7 @@ public class RpcConsumerProxy implements InvocationHandler {
         RequestPacket requestPacket = new RequestPacket();
         List<String> requestParamTypeNames = new ArrayList<>();
         List<Object> transObjects = new ArrayList<>();
-        for (int i = 0 ;i < args.length;i++) {
+        for (int i = 0; i < args.length; i++) {
             if (args[i] == null) {
                 // 参数为null，封装一个空对象
                 NullObject nullObject = new NullObject(methodParameterTypes[i].getTypeName());

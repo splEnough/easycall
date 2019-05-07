@@ -89,7 +89,7 @@ public class DefaultZookeeperSubscriber implements Subscriber {
             if (currentIpSet == null) {
                 if (listeningSubPathSet.contains(serviceVersionPath)) {
                     // 正在监听子节点数据变化
-                    return null;
+                     return null;
                 }
                 synchronized (serviceVersionPath) {
                     Set<String> doubleCheckIpList = serviceVersionIpsSetMap.get(serviceVersionPath);

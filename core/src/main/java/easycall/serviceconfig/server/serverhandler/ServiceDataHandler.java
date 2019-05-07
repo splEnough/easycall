@@ -100,7 +100,7 @@ public class ServiceDataHandler extends RequestHandlerBase {
         List<Object> transObjects = new ArrayList<>();
         transObjects.add(invokeResult);
         ResponsePacket responsePacket = new ResponsePacket();
-        responsePacket.setSerializeType((SerializeType) serverInitializer.getInitProperties().get("serializeType"));
+        responsePacket.setSerializeType(serverInitializer.getSerializeType());
         responsePacket.setRequestId(requestPacket.getRequestId());
         responsePacket.setMessageType(MessageType.SERVICE_DATA_RESPONSE);
         responsePacket.setResultCode(resultCode);

@@ -48,7 +48,7 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
 
     public DefaultNioServerStarter(ServerInitializer serverInitializer, ExecutorManager executorManager, RpcProviderManager rpcProviderManager) {
         this.serverInitializer = serverInitializer;
-        this.port = (Integer)(serverInitializer.getInitProperties().get("port"));
+        this.port = serverInitializer.getPort();
         this.executorManager = executorManager;
         this.rpcProviderManager = rpcProviderManager;
     }

@@ -31,4 +31,8 @@ public class StringUtil {
         // 都为null
         return true;
     }
+
+    public static boolean isEmpty(String str) {
+        return str == null || str.length() == 0;
+    }
 }

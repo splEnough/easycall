@@ -116,7 +116,7 @@ public class ProviderSpringBean<T> implements ApplicationListener<ContextRefresh
         this.targetServiceImpl = (T)applicationContext.getBean(targetBeanName);
         this.rpcProviderManager = (RpcProviderManager) applicationContext.getBean("rpcProviderManager");
         if (this.version == null) {
-            version = (String)((ServerInitializer)applicationContext.getBean("serverInitializer")).getInitialParam("version");
+            version = ((ServerInitializer)applicationContext.getBean("serverInitializer")).getVersion();
             rpcProvider.setVersion(version);
         }
         // 线程池处理
