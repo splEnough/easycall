@@ -6,10 +6,9 @@ import easycall.codec.packet.MessageType;
 import easycall.codec.packet.NullObject;
 import easycall.codec.packet.RequestPacket;
 import easycall.codec.packet.ResponsePacket;
-import easycall.codec.serializer.SerializeType;
 import easycall.exception.DataSerializeException;
 import easycall.exception.ResultCode;
-import easycall.initconfig.ServerInitializer;
+import easycall.initconfig.ServerParam;
 import easycall.serviceconfig.server.RPCProvider;
 import io.netty.channel.Channel;
 
@@ -24,8 +23,8 @@ import java.util.List;
  */
 public class ServiceDataHandler extends RequestHandlerBase {
 
-    public ServiceDataHandler(Channel channel, RequestPacket packet, RPCProvider<?> rpcProvider, ServerInitializer serverInitializer) {
-        super(channel, packet ,rpcProvider, serverInitializer);
+    public ServiceDataHandler(Channel channel, RequestPacket packet, RPCProvider<?> rpcProvider, ServerParam serverParam) {
+        super(channel, packet ,rpcProvider, serverParam);
     }
 
     @Override
@@ -100,7 +99,7 @@ public class ServiceDataHandler extends RequestHandlerBase {
         List<Object> transObjects = new ArrayList<>();
         transObjects.add(invokeResult);
         ResponsePacket responsePacket = new ResponsePacket();
-        responsePacket.setSerializeType(serverInitializer.getSerializeType());
+        responsePacket.setSerializeType(serverParam.getSerializeType());
         responsePacket.setRequestId(requestPacket.getRequestId());
         responsePacket.setMessageType(MessageType.SERVICE_DATA_RESPONSE);
         responsePacket.setResultCode(resultCode);

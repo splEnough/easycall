@@ -1,6 +1,6 @@
 package easycall.network.server.starter;
 
-import easycall.initconfig.ServerInitializer;
+import easycall.initconfig.ServerParam;
 import easycall.network.common.handler.MagicCheckHandler;
 import easycall.network.server.nettyhandler.IdleChannelCloseHandler;
 import easycall.network.server.nettyhandler.RequestDataHandlerDispatcher;
@@ -28,7 +28,7 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
     // 启动监听的端口
     private Integer port;
     // 初始化器
-    private ServerInitializer serverInitializer;
+    private ServerParam serverParam;
     // 5秒的绑定超时
     private Integer bindTimeout = 5;
 
@@ -46,9 +46,9 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
 
     private RpcProviderManager rpcProviderManager;
 
-    public DefaultNioServerStarter(ServerInitializer serverInitializer, ExecutorManager executorManager, RpcProviderManager rpcProviderManager) {
-        this.serverInitializer = serverInitializer;
-        this.port = serverInitializer.getPort();
+    public DefaultNioServerStarter(ServerParam serverParam, ExecutorManager executorManager, RpcProviderManager rpcProviderManager) {
+        this.serverParam = serverParam;
+        this.port = serverParam.getPort();
         this.executorManager = executorManager;
         this.rpcProviderManager = rpcProviderManager;
     }
@@ -77,7 +77,7 @@ public class DefaultNioServerStarter extends ServerStarterAdapter {
                             // 关闭空闲连接
                             ch.pipeline().addLast(new IdleChannelCloseHandler());
                             // 请求数据处理器
-                            ch.pipeline().addLast(new RequestDataHandlerDispatcher(executorManager, rpcProviderManager, serverInitializer));
+                            ch.pipeline().addLast(new RequestDataHandlerDispatcher(executorManager, rpcProviderManager, serverParam));
                         }
                     });
             try {

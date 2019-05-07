@@ -1,18 +1,19 @@
 package easycall.initconfig;
 
 import easycall.codec.serializer.SerializeType;
+import easycall.loadbalance.LoadBalanceType;
 import io.netty.util.internal.StringUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 服务端启动加载器，主要是对运行的必要参数的检测和加载
- * @author 翁富鑫 2019/3/2 20:03
+ * 客户端参数
+ * @author 翁富鑫 2019/3/28 10:33
  */
-public class ServerInitializer {
+public class ClientParam {
 
-    public ServerInitializer() {
+    public ClientParam() {
         init();
     }
 
@@ -20,14 +21,21 @@ public class ServerInitializer {
     private SerializeType serializeType = SerializeType.PROTO_STUFF;
     private String connString;
     // 服务的版本号，统一设置
-    private String version;
+    private String version = "1.0";
+    // 默认随机选择
+    private LoadBalanceType loadBalanceType = LoadBalanceType.RANDOM;
+    // 超时时间毫秒
+    private Long rpcTimeout = 5000L;
 
     private void init() {
         // 默认的端口号
-        String portString = System.getProperty("easycall.provider.port");
-        String serializeType = System.getProperty("easycall.provider.type");
-        String connString = System.getProperty("easycall.provider.connString");
-        String version = System.getProperty("easycall.provider.version");
+        String portString = System.getProperty("easycall.consumer.port");
+        String serializeType = System.getProperty("easycall.consumer.serializeType");
+        String connString = System.getProperty("easycall.consumer.connString");
+        String version = System.getProperty("easycall.consumer.version");
+        String rpcTimeout = System.getProperty("easycall.consumer.rpcTimeout");
+        // 数字
+        String loadBalanceType = System.getProperty("easycall.consumer.loadBalanceType");
         if (!StringUtil.isNullOrEmpty(portString)) {
             try {
                 this.port = Integer.parseInt(portString);
@@ -36,8 +44,12 @@ public class ServerInitializer {
             }
         }
         this.serializeType = getSerializeType(serializeType);
-        this.connString = connString;
-        this.version = version;
+        this.connString = (connString == null)? this.connString : connString;
+        this.version = (version == null)? this.version : version;
+        if (!StringUtil.isNullOrEmpty(loadBalanceType)) {
+            this.loadBalanceType = LoadBalanceType.getTypeByCode(Integer.parseInt(loadBalanceType));
+        }
+        this.rpcTimeout = (rpcTimeout == null)? this.rpcTimeout : Long.parseLong(rpcTimeout);
     }
 
     public SerializeType getSerializeType(String serializeType) {
@@ -92,5 +104,25 @@ public class ServerInitializer {
 
     public void setConnString(String connString) {
         this.connString = connString;
+    }
+
+    public LoadBalanceType getLoadBalanceType() {
+        return loadBalanceType;
+    }
+
+    public void setLoadBalanceType(LoadBalanceType loadBalanceType) {
+        this.loadBalanceType = loadBalanceType;
+    }
+
+    public void setLoadBalanceType(Integer loadBalanceType) {
+        this.loadBalanceType = LoadBalanceType.getTypeByCode(loadBalanceType);
+    }
+
+    public Long getRpcTimeout() {
+        return rpcTimeout;
+    }
+
+    public void setRpcTimeout(Long rpcTimeout) {
+        this.rpcTimeout = rpcTimeout;
     }
 }

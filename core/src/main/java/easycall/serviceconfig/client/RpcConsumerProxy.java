@@ -6,7 +6,7 @@ import easycall.codec.packet.RequestPacket;
 import easycall.codec.serializer.SerializeType;
 import easycall.exception.DataSerializeException;
 import easycall.exception.RpcCallResponseTimeOutException;
-import easycall.initconfig.ClientInitializer;
+import easycall.initconfig.ClientParam;
 import easycall.network.client.Connection;
 import easycall.network.client.ConnectionFactory;
 
@@ -30,10 +30,10 @@ public class RpcConsumerProxy implements InvocationHandler {
     private String targetVersion;
     private long rpcTimeout;
     private ConnectionFactory connectionFactory;
-    private ClientInitializer clientInitializer;
+    private ClientParam clientInitializer;
     private RpcMessageManager rpcMessageManager;
 
-    public RpcConsumerProxy(ConnectionFactory connectionFactory, String targetService, String targetVersion, ClientInitializer clientInitializer, RpcMessageManager rpcMessageManager, long rpcTimeout, Class<?> classType) {
+    public RpcConsumerProxy(ConnectionFactory connectionFactory, String targetService, String targetVersion, ClientParam clientInitializer, RpcMessageManager rpcMessageManager, long rpcTimeout, Class<?> classType) {
         this.connectionFactory = connectionFactory;
         this.targetService = targetService;
         this.targetVersion = targetVersion;
@@ -51,7 +51,7 @@ public class RpcConsumerProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // 重新建立连接，否则的话会一直使用同一个连接
-        rpcConnection = this.connectionFactory.buildTargetServiceConnection(targetService, targetVersion, (Integer) clientInitializer.getInitialParam("port"), 5, TimeUnit.SECONDS);
+        rpcConnection = this.connectionFactory.buildTargetServiceConnection(targetService, targetVersion, clientInitializer.getPort(), 5, TimeUnit.SECONDS);
         Class<?>[] methodParameterTypes = method.getParameterTypes();
         RequestPacket requestPacket = packageRequestParam(methodParameterTypes, args, method.getName());
         Object rpcResult = rpcMessageManager.sendRequest(rpcConnection.getConnectionChannel(), requestPacket);
@@ -80,7 +80,7 @@ public class RpcConsumerProxy implements InvocationHandler {
         requestPacket.setTransObjectTypeNames(requestParamTypeNames);
         requestPacket.setTargetMethod(methodName);
         requestPacket.setTimeout(rpcTimeout);
-        requestPacket.setSerializeType((SerializeType) clientInitializer.getInitialParam("serializeType"));
+        requestPacket.setSerializeType(clientInitializer.getSerializeType());
         return requestPacket;
     }
 

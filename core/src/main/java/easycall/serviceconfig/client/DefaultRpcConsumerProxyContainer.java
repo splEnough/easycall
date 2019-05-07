@@ -1,7 +1,7 @@
 package easycall.serviceconfig.client;
 
 import easycall.exception.ExportTypeException;
-import easycall.initconfig.ClientInitializer;
+import easycall.initconfig.ClientParam;
 import easycall.network.client.ConnectionFactory;
 
 import java.util.Map;
@@ -17,12 +17,12 @@ public class DefaultRpcConsumerProxyContainer implements RpcConsumerProxyContain
      * 保存所有的代理类，key为代理的服务serviceName+"-"+version
      */
     private Map<String, RpcConsumerProxy> consumerProxyMap = new ConcurrentHashMap<>();
-    private ClientInitializer clientInitializer;
+    private ClientParam clientParam;
     private ConnectionFactory connectionFactory;
     private RpcMessageManager rpcMessageManager;
 
-    public DefaultRpcConsumerProxyContainer(ClientInitializer clientInitializer, ConnectionFactory connectionFactory, RpcMessageManager rpcMessageManager) {
-        this.clientInitializer = clientInitializer;
+    public DefaultRpcConsumerProxyContainer(ClientParam clientParam, ConnectionFactory connectionFactory, RpcMessageManager rpcMessageManager) {
+        this.clientParam = clientParam;
         this.connectionFactory = connectionFactory;
         this.rpcMessageManager = rpcMessageManager;
     }
@@ -58,17 +58,17 @@ public class DefaultRpcConsumerProxyContainer implements RpcConsumerProxyContain
         if (paramMap.get("serviceName") != null) {
             serviceName = (String) paramMap.get("serviceName");
         }
-        String version = (String)clientInitializer.getInitialParam("version");
+        String version = clientParam.getVersion();
         if (paramMap.get("version") != null) {
             version = (String) paramMap.get("version");
         }
         String key = key(serviceName, version);
-        long timeout = (long)clientInitializer.getInitialParam("rpcTimeout");
+        long timeout = clientParam.getRpcTimeout();
         if (paramMap.get("timeout") != null) {
             timeout = (long) paramMap.get("timeout");
         }
         RpcConsumerProxy rpcConsumerProxy = new RpcConsumerProxy(connectionFactory, serviceName, version,
-                clientInitializer, rpcMessageManager, timeout, cls);
+                clientParam, rpcMessageManager, timeout, cls);
         consumerProxyMap.put(key, rpcConsumerProxy);
         return rpcConsumerProxy;
     }

@@ -1,6 +1,6 @@
 package wfx.provider;
 
-import easycall.initconfig.ServerInitializer;
+import easycall.initconfig.ServerParam;
 import easycall.network.server.starter.ServerStarter;
 import easycall.registercenter.server.Register;
 import easycall.serviceconfig.server.RPCProvider;
@@ -116,7 +116,7 @@ public class ProviderSpringBean<T> implements ApplicationListener<ContextRefresh
         this.targetServiceImpl = (T)applicationContext.getBean(targetBeanName);
         this.rpcProviderManager = (RpcProviderManager) applicationContext.getBean("rpcProviderManager");
         if (this.version == null) {
-            version = ((ServerInitializer)applicationContext.getBean("serverInitializer")).getVersion();
+            version = ((ServerParam)applicationContext.getBean("serverInitializer")).getVersion();
             rpcProvider.setVersion(version);
         }
         // 线程池处理

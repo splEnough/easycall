@@ -5,9 +5,8 @@ import easycall.codec.packet.MessageType;
 import easycall.codec.packet.Packet;
 import easycall.codec.packet.RequestPacket;
 import easycall.codec.packet.ResponsePacket;
-import easycall.codec.serializer.SerializeType;
 import easycall.exception.*;
-import easycall.initconfig.ServerInitializer;
+import easycall.initconfig.ServerParam;
 import easycall.serviceconfig.server.RPCProvider;
 import easycall.serviceconfig.server.RpcProviderManager;
 import easycall.serviceconfig.server.serverhandler.HeartBeatHandler;
@@ -45,14 +44,14 @@ public class RequestDataHandlerDispatcherProxy {
      */
     private RpcProviderManager rpcProviderManager;
 
-    private ServerInitializer serverInitializer;
+    private ServerParam serverParam;
 
-    public RequestDataHandlerDispatcherProxy(Channel channel, ByteBuf buf, ExecutorManager executorManager, RpcProviderManager rpcProviderManager, ServerInitializer serverInitializer) {
+    public RequestDataHandlerDispatcherProxy(Channel channel, ByteBuf buf, ExecutorManager executorManager, RpcProviderManager rpcProviderManager, ServerParam serverParam) {
         this.channel = channel;
         this.buf = buf;
         this.executorManager = executorManager;
         this.rpcProviderManager = rpcProviderManager;
-        this.serverInitializer = serverInitializer;
+        this.serverParam = serverParam;
     }
 
     public void handle() {
@@ -66,7 +65,7 @@ public class RequestDataHandlerDispatcherProxy {
                 switch (packet.getMessageType()) {
                     case HEARTBEAT_REQUEST:
                         // 处理心跳
-                        executorManager.submitTask(new HeartBeatHandler(channel , requestPacket, null , serverInitializer));
+                        executorManager.submitTask(new HeartBeatHandler(channel , requestPacket, null , serverParam));
                         break;
                     case SERVICE_DATA_REQUEST:
                         // 处理业务请求
@@ -116,7 +115,7 @@ public class RequestDataHandlerDispatcherProxy {
         List<Object> transObjects = new ArrayList<>();
         transObjects.add(error);
         ResponsePacket responsePacket = new ResponsePacket();
-        responsePacket.setSerializeType(serverInitializer.getSerializeType());
+        responsePacket.setSerializeType(serverParam.getSerializeType());
         responsePacket.setRequestId(requestId);
         responsePacket.setMessageType(MessageType.SERVICE_DATA_RESPONSE);
         responsePacket.setResultCode(resultCode);
@@ -148,10 +147,10 @@ public class RequestDataHandlerDispatcherProxy {
         }
         if (rpcProvider.getExecutorService() != null) {
             // 数据处理的任务交由其专属线程执行
-            rpcProvider.getExecutorService().submit(new ServiceDataHandler(channel , requestPacket, rpcProvider, serverInitializer));
+            rpcProvider.getExecutorService().submit(new ServiceDataHandler(channel , requestPacket, rpcProvider, serverParam));
         } else {
             // 交由公共的处理线程池进行处理
-            executorManager.submitTask(new ServiceDataHandler(channel , requestPacket, rpcProvider, serverInitializer));
+            executorManager.submitTask(new ServiceDataHandler(channel , requestPacket, rpcProvider, serverParam));
         }
     }
 

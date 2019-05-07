@@ -1,6 +1,6 @@
 package easycall.boot;
 
-import easycall.initconfig.ClientInitializer;
+import easycall.initconfig.ClientParam;
 import easycall.loadbalance.LoadBalanceType;
 import easycall.network.client.ConnectionFactory;
 import easycall.network.client.connection.PooledConnectionFactory;
@@ -27,7 +27,7 @@ public class ClientBoot implements Closeable{
     private ConnectionManager connectionManager;
     private ConnectionFactory connectionFactory;
     private Subscriber subscriber;
-    private ClientInitializer clientInitializer;
+    private ClientParam clientParam;
     private String connString;
     private RpcConsumerProxyContainer consumerProxyContainer;
     private RpcMessageManager rpcMessageManager;
@@ -35,14 +35,14 @@ public class ClientBoot implements Closeable{
 
     public ClientBoot(String connString) {
         this.connString = connString;
-        this.clientInitializer = new ClientInitializer();
+        this.clientParam = new ClientParam();
         this.connectionManager = new DefaultConnectionManager();
         this.subscriber = new DefaultZookeeperSubscriber(this.connString);
         this.rpcMessageManager = new DefaultRpcMessageManager();
         this.connectionFactory = new PooledConnectionFactory(connectionManager, LoadBalanceType.getLoadBalancerByCode(
-                ((LoadBalanceType)clientInitializer.getInitialParam("loadBalanceType")).getCode(), subscriber),rpcMessageManager
+                clientParam.getLoadBalanceType().getCode(), subscriber),rpcMessageManager
         );
-        consumerProxyContainer = new DefaultRpcConsumerProxyContainer(clientInitializer, connectionFactory, rpcMessageManager);
+        consumerProxyContainer = new DefaultRpcConsumerProxyContainer(clientParam, connectionFactory, rpcMessageManager);
     }
 
     public void start() {

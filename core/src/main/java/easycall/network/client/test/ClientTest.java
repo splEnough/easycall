@@ -13,7 +13,7 @@ import java.util.List;
 public class ClientTest {
     public static void main(String[] args) throws Exception{
 //        ConnectionManager connectionManager = new DefaultConnectionManager();
-//        ClientInitializer clientInitializer = new ClientInitializer();
+//        ClientParam clientInitializer = new ClientParam();
 //
 //        ConnectionFactory factory = new PooledConnectionFactory(connectionManager, null);
 //        Connection connection = factory.buildConnection("127.0.0.1",8888, 5,TimeUnit.SECONDS);

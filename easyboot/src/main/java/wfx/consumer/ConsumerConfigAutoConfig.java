@@ -1,6 +1,7 @@
 package wfx.consumer;
 
-import easycall.initconfig.ClientInitializer;
+import easycall.Util.StringUtil;
+import easycall.initconfig.ClientParam;
 import easycall.loadbalance.LoadBalanceType;
 import easycall.network.client.ConnectionFactory;
 import easycall.network.client.connection.PooledConnectionFactory;
@@ -42,8 +43,27 @@ public class ConsumerConfigAutoConfig {
     }
 
     @Bean
-    public ClientInitializer clientInitializer() {
-        return new ClientInitializer();
+    public ClientParam clientParam(ConsumerConfigProperties consumerConfigProperties) {
+        ClientParam clientParam = new ClientParam();
+        if (!StringUtil.isEmpty(consumerConfigProperties.getConnString())) {
+            clientParam.setConnString(consumerConfigProperties.getConnString());
+        }
+        if (!StringUtil.isEmpty(consumerConfigProperties.getPort())) {
+            clientParam.setPort(Integer.parseInt(consumerConfigProperties.getPort()));
+        }
+        if (!StringUtil.isEmpty(consumerConfigProperties.getSerializeType())) {
+            clientParam.setSerializeType(consumerConfigProperties.getSerializeType());
+        }
+        if (!StringUtil.isEmpty(consumerConfigProperties.getVersion())) {
+            clientParam.setVersion(consumerConfigProperties.getVersion());
+        }
+        if (!StringUtil.isEmpty(consumerConfigProperties.getLoadBalanceType())) {
+            clientParam.setLoadBalanceType(Integer.parseInt(consumerConfigProperties.getLoadBalanceType()));
+        }
+        if (!StringUtil.isEmpty(consumerConfigProperties.getRpcTimeout())) {
+
+        }
+        return clientParam;
     }
 
     @Bean
@@ -52,9 +72,8 @@ public class ConsumerConfigAutoConfig {
     }
 
     @Bean
-    public Subscriber subscriber(ConsumerConfigProperties consumerConfigProperties) {
-        System.out.println("connString:" + consumerConfigProperties.getConnString());
-        return new DefaultZookeeperSubscriber(consumerConfigProperties.getConnString());
+    public Subscriber subscriber(ClientParam clientParam) {
+        return new DefaultZookeeperSubscriber(clientParam.getConnString());
     }
 
     @Bean
@@ -63,15 +82,15 @@ public class ConsumerConfigAutoConfig {
     }
 
     @Bean
-    public ConnectionFactory connectionFactory(ConsumerConfigProperties consumerConfigProperties) {
+    public ConnectionFactory connectionFactory(ClientParam clientParam) {
         return new PooledConnectionFactory(connectionManager(), LoadBalanceType.getLoadBalancerByCode(
-                ((LoadBalanceType)clientInitializer().getInitialParam("loadBalanceType")).getCode(), subscriber(consumerConfigProperties)),rpcMessageManager()
+                clientParam.getLoadBalanceType().getCode(), subscriber(clientParam)),rpcMessageManager()
         );
     }
 
     @Bean
     public RpcConsumerProxyContainer rpcConsumerProxyContainer(ConsumerConfigProperties consumerConfigProperties) {
-        return new DefaultRpcConsumerProxyContainer(clientInitializer(), connectionFactory(consumerConfigProperties), rpcMessageManager());
+        return new DefaultRpcConsumerProxyContainer(clientParam(consumerConfigProperties), connectionFactory(clientParam(consumerConfigProperties)), rpcMessageManager());
     }
 
 }

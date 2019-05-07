@@ -1,7 +1,7 @@
 package wfx.provider;
 
 import easycall.Util.StringUtil;
-import easycall.initconfig.ServerInitializer;
+import easycall.initconfig.ServerParam;
 import easycall.network.server.starter.DefaultNioServerStarter;
 import easycall.network.server.starter.ServerStarter;
 import easycall.registercenter.server.DefaultZookeeperRegister;
@@ -29,23 +29,26 @@ public class ProviderConfigAutoConfig {
     }
 
     @Bean
-    public ServerInitializer serverInitializer(ProviderConfigProperties providerConfigProperties) {
-        ServerInitializer serverInitializer = new ServerInitializer();
+    public ServerParam serverInitializer(ProviderConfigProperties providerConfigProperties) {
+        ServerParam serverParam = new ServerParam();
         if (!StringUtil.isEmpty(providerConfigProperties.getPort())) {
-            serverInitializer.setPort(Integer.parseInt(providerConfigProperties.getPort()));
+            serverParam.setPort(Integer.parseInt(providerConfigProperties.getPort()));
         }
         if (!StringUtil.isEmpty(providerConfigProperties.getConnString())) {
-            serverInitializer.setConnString(providerConfigProperties.getConnString());
+            serverParam.setConnString(providerConfigProperties.getConnString());
         }
         if (!StringUtil.isEmpty(providerConfigProperties.getSerialize())) {
-            serverInitializer.setSerializeType(providerConfigProperties.getSerialize());
+            serverParam.setSerializeType(providerConfigProperties.getSerialize());
         }
-        return serverInitializer;
+        if (!StringUtil.isEmpty(providerConfigProperties.getVersion())) {
+            serverParam.setVersion(providerConfigProperties.getVersion());
+        }
+        return serverParam;
     }
 
     @Bean
-    public Register register(ServerInitializer serverInitializer) {
-        return new DefaultZookeeperRegister(serverInitializer.getConnString());
+    public Register register(ServerParam serverParam) {
+        return new DefaultZookeeperRegister(serverParam.getConnString());
     }
 
     @Bean
@@ -54,7 +57,7 @@ public class ProviderConfigAutoConfig {
     }
 
     @Bean
-    public ServerStarter serverStarter(ServerInitializer initializer, RpcProviderManager rpcProviderManager) {
+    public ServerStarter serverStarter(ServerParam initializer, RpcProviderManager rpcProviderManager) {
         return new DefaultNioServerStarter(initializer, executorManager(), rpcProviderManager);
     }
 

@@ -1,7 +1,7 @@
 package easycall.serviceconfig.server.serverhandler;
 
 import easycall.codec.packet.RequestPacket;
-import easycall.initconfig.ServerInitializer;
+import easycall.initconfig.ServerParam;
 import easycall.serviceconfig.server.RPCProvider;
 import io.netty.channel.Channel;
 
@@ -14,13 +14,13 @@ public abstract class RequestHandlerBase implements Runnable {
     protected Channel channel;
     protected RequestPacket requestPacket;
     protected RPCProvider<?> rpcProvider;
-    protected ServerInitializer serverInitializer;
+    protected ServerParam serverParam;
 
-    protected RequestHandlerBase(Channel channel , RequestPacket packet, RPCProvider rpcProvider, ServerInitializer serverInitializer) {
+    protected RequestHandlerBase(Channel channel , RequestPacket packet, RPCProvider rpcProvider, ServerParam serverParam) {
         this.channel = channel;
         this.requestPacket = packet;
         this.rpcProvider = rpcProvider;
-        this.serverInitializer = serverInitializer;
+        this.serverParam = serverParam;
     }
 
 }

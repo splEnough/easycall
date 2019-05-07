@@ -1,6 +1,6 @@
 package easycall.boot;
 
-import easycall.initconfig.ServerInitializer;
+import easycall.initconfig.ServerParam;
 import easycall.network.server.starter.DefaultNioServerStarter;
 import easycall.network.server.starter.ServerStarter;
 import easycall.registercenter.server.DefaultZookeeperRegister;
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ServerBoot implements Closeable{
 
-    private ServerInitializer initializer ;
+    private ServerParam initializer ;
     private ExecutorManager executorManager;
     ServerStarter serverStarter;
     private Register register;
@@ -42,7 +42,7 @@ public class ServerBoot implements Closeable{
     }
 
     private void init() {
-        initializer = new ServerInitializer();
+        initializer = new ServerParam();
         executorManager = new DefaultExecutorManager();
         register = new DefaultZookeeperRegister(connString);
         rpcProviderManager = new RpcProviderManager(register);
@@ -70,7 +70,7 @@ public class ServerBoot implements Closeable{
         executorManager.close();
     }
 
-    public ServerInitializer getInitializer() {
+    public ServerParam getInitializer() {
         return initializer;
     }
 

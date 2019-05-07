@@ -1,6 +1,6 @@
 package easycall.network.server.nettyhandler;
 
-import easycall.initconfig.ServerInitializer;
+import easycall.initconfig.ServerParam;
 import easycall.serviceconfig.server.RpcProviderManager;
 import easycall.thread.ExecutorManager;
 import io.netty.buffer.ByteBuf;
@@ -16,18 +16,18 @@ public class RequestDataHandlerDispatcher extends SimpleChannelInboundHandler {
 
     private ExecutorManager executorManager;
     private RpcProviderManager rpcProviderManager;
-    private ServerInitializer serverInitializer;
+    private ServerParam serverParam;
 
-    public RequestDataHandlerDispatcher(ExecutorManager executorManager, RpcProviderManager rpcProviderManager , ServerInitializer serverInitializer) {
+    public RequestDataHandlerDispatcher(ExecutorManager executorManager, RpcProviderManager rpcProviderManager , ServerParam serverParam) {
         this.executorManager = executorManager;
         this.rpcProviderManager = rpcProviderManager;
-        this.serverInitializer = serverInitializer;
+        this.serverParam = serverParam;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         // 在这个地方进行处理线程的交接，处理线程处理完毕之后将处理的结果写回，客户端通过requestId进行返回结果的分配
-        new RequestDataHandlerDispatcherProxy(ctx.channel() , (ByteBuf) msg, executorManager, rpcProviderManager, serverInitializer).handle();
+        new RequestDataHandlerDispatcherProxy(ctx.channel() , (ByteBuf) msg, executorManager, rpcProviderManager, serverParam).handle();
     }
 
 }

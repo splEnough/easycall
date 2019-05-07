@@ -12,9 +12,19 @@ public class ProviderConfigProperties {
     private String port;
     // 序列化类型
     private String serialize;
+    // RPC服务版本
+    private String version;
 
     public ProviderConfigProperties() {
         System.out.println("ProviderConfigProperties --- init()");
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public String getSerialize() {

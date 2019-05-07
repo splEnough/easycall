@@ -72,7 +72,7 @@ public class ConsumerParserPostProcessor implements BeanFactoryPostProcessor, Ap
     private ConsumerProperties bindConsumerProperties(ConfigurableListableBeanFactory beanFactory) {
         ConsumerProperties consumerProperties = new ConsumerProperties();
         consumerProperties.setSubscriber(beanFactory.getBeanDefinition("subscriber"));
-        consumerProperties.setClientInitializer(beanFactory.getBeanDefinition("clientInitializer"));
+        consumerProperties.setClientInitializer(beanFactory.getBeanDefinition("clientParam"));
         consumerProperties.setConnectionFactory(beanFactory.getBeanDefinition("connectionFactory"));
         consumerProperties.setRpcMessageManager(beanFactory.getBeanDefinition("rpcMessageManager"));
         consumerProperties.setConsumerProxyContainer(beanFactory.getBeanDefinition("rpcConsumerProxyContainer"));
