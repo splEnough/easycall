@@ -21,7 +21,6 @@ public class ProviderServiceBeanGeneratorSelector implements ImportBeanDefinitio
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         String className = importingClassMetadata.getClassName();
         String targetClassBeanName = StringUtil.firstCharToLow(className.substring(className.lastIndexOf(".") + 1));
-        System.out.println("targetClassBeanName:" + targetClassBeanName);
         String proxyBeanName = className + BEAN_NAME_SUFFIX;
         Class<?> targetClass;
         try {

@@ -26,6 +26,11 @@
     <dependencies>
         <dependency>
             <groupId>wfx</groupId>
+            <artifactId>provider-test</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>wfx</groupId>
             <artifactId>easy-boot</artifactId>
             <version>1.0</version>
         </dependency>

@@ -15,10 +15,19 @@ public class TestController {
     @Autowired
     private EchoServiceSecond echoServiceSecond;
 
+    @Autowired
+    private TestService testService;
+
     @RequestMapping("/test")
     @ResponseBody
     public Object test(String msg) {
         System.out.println(Thread.currentThread().getName());
         return echoServiceSecond.echo(msg);
+    }
+
+    @RequestMapping("/service")
+    @ResponseBody
+    public Object service(String msg) {
+        return testService.service(msg);
     }
 }

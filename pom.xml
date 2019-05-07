@@ -14,6 +14,8 @@
         <module>test</module>
         <module>api</module>
         <module>providertest</module>
+        <module>test2</module>
+        <module>test3</module>
     </modules>
     <!--<modules>-->
     <!--</modules>-->

@@ -101,8 +101,11 @@ public class RequestDataHandlerDispatcherProxy {
         }
         if (packet != null) {
             // 写回错误信息
-            String errorMsg = getErrorStack(error);
-            writeResult(errorMsg, resultCode.getCode(), packet.getRequestId());
+            String errorMsg ;
+            if (error != null) {
+                errorMsg = getErrorStack(error);
+                writeResult(errorMsg, resultCode.getCode(), packet.getRequestId());
+            }
         }
     }
 

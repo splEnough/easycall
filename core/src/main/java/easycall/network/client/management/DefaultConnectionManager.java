@@ -11,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * TODO 没有随机发起调用
  * 默认的连接管理器，管理客户端的连接
  *
  * @author 翁富鑫 2019/3/1 21:21

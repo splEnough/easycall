@@ -33,7 +33,6 @@ public class ProviderBeanDefinitionBuilder {
         // 处理Bean参数
         beanDefinitionBuilder.addPropertyValue("targetBeanName" , targetBeanName);
         beanDefinitionBuilder.addPropertyValue("rpcProvider", rpcProvider);
-        System.out.println("version:" + annotation.version());
         beanDefinitionBuilder.addPropertyValue("version" , annotation.version());
         beanDefinitionBuilder.addPropertyValue("threadPoolSize" , annotation.threadPoolSize());
         beanDefinitionBuilder.addPropertyValue("proxyBeanName" , proxyBeanName);
