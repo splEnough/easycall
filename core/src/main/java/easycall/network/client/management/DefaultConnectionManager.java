@@ -32,7 +32,7 @@ public class DefaultConnectionManager implements ConnectionManager {
     /**
      * 最大空闲时间，超过则关闭连接，默认为120秒
      */
-    private static final Integer maxIdleTime = 120;
+    private static final Integer maxIdleTime = 60;
 
     /**
      * 空闲检测器
@@ -169,7 +169,7 @@ public class DefaultConnectionManager implements ConnectionManager {
         idConnectionMap.remove(longChannelId);
         try {
             // 关闭连接
-            System.out.println("DefaultConnectionManager:" + Thread.currentThread().getName() + " -- removeConnection() -- 关闭了连接，channelId:" + longChannelId);
+            System.out.println("Time(s)：" + (System.currentTimeMillis()/1000) + "，DefaultConnectionManager -- 关闭了连接，channelId:" + longChannelId.substring(0,4));
             connection.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -219,7 +219,7 @@ public class DefaultConnectionManager implements ConnectionManager {
 
         @Override
         public void run() {
-            System.out.println("启动检测");
+            System.out.println("空闲检测线程启动");
             while (true) {
                 if (idConnectionMap.size() > 0) {
                     long currentTimeMills = System.currentTimeMillis();
@@ -233,7 +233,7 @@ public class DefaultConnectionManager implements ConnectionManager {
                         if (maxIdleTime * 1000 <= idleTime) {
                             removeConnection(channelId);
                             removeKeyList.add(channelId);
-                            System.out.println("空闲检测器关闭了连接");
+                            System.out.println("Time(s)：" + (System.currentTimeMillis()/1000) + "，空闲检测器关闭了连接，channelId：" + channelId.substring(0,4));
                         }
                     }
                     // 解除channel的关系

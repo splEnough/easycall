@@ -82,7 +82,6 @@ public class DefaultZookeeperSubscriber implements Subscriber {
     @Override
     public Set<String> subscribeService(String serviceName, String version) {
         String serviceVersionPath = "/" + serviceName + "/" + version;
-        System.out.println("DefaultZookeeperSubscriber --- subscribe:" + serviceVersionPath);
         try {
             // 直接从Map中获取
             Set<String> currentIpSet = serviceVersionIpsSetMap.get(serviceVersionPath);
@@ -157,6 +156,9 @@ public class DefaultZookeeperSubscriber implements Subscriber {
                         }
                     }
                     ipSet.add(addIp);
+                    System.out.println("---------------------------");
+                    System.out.println("增加了服务端ip，目前ip列表是\n" + ipSet.toString());
+                    System.out.println("---------------------------");
                     break;
                 case INITIALIZED:
                     synchronized (serviceVersionPath) {
@@ -185,6 +187,9 @@ public class DefaultZookeeperSubscriber implements Subscriber {
                         }
                     }
                     ipSet.remove(removeIp);
+                    System.out.println("---------------------------");
+                    System.out.println("减少了服务端ip，目前ip列表是\n" + ipSet.toString());
+                    System.out.println("---------------------------");
                     break;
             }
         }

@@ -7,6 +7,7 @@ import easycall.network.client.DefaultTcpConnection;
 import easycall.network.client.management.ConnectionManager;
 import easycall.network.client.nettyhandler.ClientHeartBeatHandler;
 import easycall.network.client.nettyhandler.ClientResponseServiceDataHandler;
+import easycall.network.client.nettyhandler.InputDataShow;
 import easycall.network.common.handler.MagicCheckHandler;
 import easycall.serviceconfig.client.RpcMessageManager;
 import io.netty.bootstrap.Bootstrap;
@@ -33,9 +34,9 @@ import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 public class PooledConnectionFactory extends ConnectionFactoryAdapter {
 
     // 读空闲最大30s，与服务端的读空闲时间保持相同
-    private static final int readerIdleSeconds = 30;
+    private static final int readerIdleSeconds = 60;
     // 写空闲最大25s，保证最多在心跳发送超过5秒没收到回复后会关闭Channel
-    private static final int writerIdleSeconds = 25;
+    private static final int writerIdleSeconds = 15;
     // disabled
     private static final int allIdleSeconds = 0;
 
@@ -85,7 +86,7 @@ public class PooledConnectionFactory extends ConnectionFactoryAdapter {
                             ch.pipeline().addLast(idleStateHandler);
                             ch.pipeline().addLast(clientHeartBeatHandler);
                             ch.pipeline().addLast(clientResponseServiceDataHandler);
-                            // 进站数据显示，用于测试
+//                             进站数据显示，用于测试
 //                            ch.pipeline().addLast(new InputDataShow());
 
                             channelHandlers.add(lengthFieldPrepender);
@@ -102,6 +103,7 @@ public class PooledConnectionFactory extends ConnectionFactoryAdapter {
             ChannelFuture channelFuture;
             try {
                 channelFuture = bootstrap.connect().sync();
+                System.out.println("创建了Channel连接，channelId：" + channelFuture.channel().id().asLongText().substring(0,4));
                 ChannelFuture closeFuture = channelFuture.channel().closeFuture();
                 // 添加Channel关闭的监听器，关闭Channel后从ConnectionManager中移除
                 closeFuture.addListener((future) -> {

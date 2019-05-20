@@ -5,17 +5,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import wfx.service.EchoService;
-import wfx.service.EchoServiceSecond;
 
 /**
- * @author 翁富鑫 2019/5/6 21:26
+ * @author 翁富鑫 2019/5/19 11:15
  */
 
     @Controller
-    public class TestController {
+    public class EchoController {
         @Autowired
         private EchoService echoService;
-        @RequestMapping("/testtest")
+        @RequestMapping("/test")
         @ResponseBody
         public Object test(String msg) {
             System.out.println(Thread.currentThread().getName());

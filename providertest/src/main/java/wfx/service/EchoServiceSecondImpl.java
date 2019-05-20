@@ -10,6 +10,7 @@ import wfx.provider.Provider;
 public class EchoServiceSecondImpl implements EchoServiceSecond {
     @Override
     public String echo(String msg) {
+        new EchoServiceImpl();
         System.out.println(Thread.currentThread().getName() + " msg :" + msg);
         return "EchoServiceSecondImpl --- " + Thread.currentThread().getName() + " echo:" + msg;
     }

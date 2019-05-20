@@ -82,7 +82,7 @@ public class ClientHeartBeatHandler extends ChannelDuplexHandler implements Clos
                     }
                     ResponsePacket responsePacket = (ResponsePacket) packet;
                     // 心跳返回数据，不做特殊处理
-                    handleHeartbeatResponse(responsePacket);
+                    handleHeartbeatResponse(ctx, responsePacket);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -127,6 +127,7 @@ public class ClientHeartBeatHandler extends ChannelDuplexHandler implements Clos
                             packet.setTargetMethod(HEARTBEAT_METHOD);
                             packet.setTransObjects(transObjects);
                             packet.setSerializeType(HEARTBEAT_SERIALIZE_TYPE);
+                            System.out.println("Time(s)：" + (System.currentTimeMillis()/1000) + "，channel（" + channel.id().asLongText().substring(0,4) +  "）发送心跳：" + HEARTBEAT_SEQUENCE);
                             // 发送心跳数据
                             result = Framer.encode(packet);
                             ctx.writeAndFlush(result);
@@ -145,16 +146,17 @@ public class ClientHeartBeatHandler extends ChannelDuplexHandler implements Clos
         cause.printStackTrace();
     }
 
-    private void handleHeartbeatResponse(ResponsePacket responsePacket) {
-        // do nothing
-//        // 传输的对象
-//        List<Object> objectList = responsePacket.getObjects();
-//        // 对象对应的类型
-//        List<String> paramTypeNames = responsePacket.getObjectTypeNames();
-//        int size = objectList.size();
-//        for (int i = 0; i < size; i++) {
+    private void handleHeartbeatResponse(ChannelHandlerContext ctx, ResponsePacket responsePacket) {
+//         do nothing
+        // 传输的对象
+        List<Object> objectList = responsePacket.getObjects();
+        // 对象对应的类型
+        List<String> paramTypeNames = responsePacket.getObjectTypeNames();
+        int size = objectList.size();
+        for (int i = 0; i < size; i++) {
+            System.out.println("Time(s)：" + (System.currentTimeMillis()/1000) + "，channel（" + ctx.channel().id().asLongText().substring(0,4) + "）收到心跳回复：" + objectList.get(i));
 //            System.out.println(i + ": type:" + paramTypeNames.get(i) + ",value:" + objectList.get(i));
-//        }
+        }
     }
 
     @Override

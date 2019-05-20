@@ -2,19 +2,14 @@ package wfx.config;
 
 import org.springframework.context.annotation.Configuration;
 import wfx.consumer.Consumer;
+import wfx.service.EchoService;
 import wfx.service.EchoServiceSecond;
 import wfx.service.HelloService;
 
-/**
- * @author 翁富鑫 2019/4/29 21:58
- */
 @Configuration
 public class ServiceConfig {
-
-    public ServiceConfig() {
-        System.out.println("serviceConfig init --- ");
-    }
-
-    @Consumer(value = "echoServiceSecond", interfaceName = HelloService.class, version = "1.0", timeout = 1000)
-    private EchoServiceSecond helloService;
+    @Consumer(value = "echoService", interfaceName = EchoService.class
+            , version = "1.0", timeout = 3000)
+    private EchoService echoService;
 }
+

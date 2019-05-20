@@ -24,12 +24,13 @@ public class KryoSerializer {
             throw new DataDeSerializeException("序列化的数据不能为空");
         }
         Kryo kryo = new Kryo();
-        Output output = new Output(1024);
+        Output output = new Output(502400000);
         byte[] data = null;
         try {
             kryo.writeClassAndObject(output, object);
             data = output.toBytes();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new KryoException("序列化数据失败");
         } finally {
             output.close();
