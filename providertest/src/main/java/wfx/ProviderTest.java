@@ -1,10 +1,8 @@
 package wfx;
 
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import wfx.service.EchoServiceSecond;
 
 import java.util.Iterator;
 

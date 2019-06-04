@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.lang.Nullable;
 
 import java.lang.reflect.Proxy;
 import java.util.Map;
@@ -25,14 +24,12 @@ public class ConsumerSpringBean implements FactoryBean, InitializingBean, Applic
     private Map<String,Object> paramMap;
     private ApplicationContext applicationContext;
 
-    @Nullable
     @Override
     public Object getObject() throws Exception {
         // 获取RPC代理对象
         return Proxy.newProxyInstance(interfaceClass.getClassLoader(), new Class[]{interfaceClass}, this.consumerProxyContainer.getProxyByInterfaceType(interfaceClass, paramMap));
     }
 
-    @Nullable
     @Override
     public Class<?> getObjectType() {
         return interfaceClass;

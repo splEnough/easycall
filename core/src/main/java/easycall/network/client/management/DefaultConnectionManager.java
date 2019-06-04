@@ -40,9 +40,9 @@ public class DefaultConnectionManager implements ConnectionManager {
     private IdleConnectionRemoveManager idleConnectionRemoveManager;
 
     /**
-     * 每个host+port上最多建立的TCP连接，默认为5个
+     * 每个host+port上最多建立的TCP连接，默认为1个
      */
-    private static final Integer eachPortMaxConnection = 5;
+    private static final Integer eachPortMaxConnection = 1;
 
     /**
      * 检测器线程

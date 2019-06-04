@@ -3,6 +3,13 @@ server:
 easycall:
   consumer:
     enabled: true
-    connString: 192.168.85.129:2181,192.168.85.130:2181,192.168.85.131:2181
+    connString: 192.168.40.128:2181
   provider:
-    connString: 192.168.85.129:2181,192.168.85.130:2181,192.168.85.131:2181
+    connString: 192.168.40.128:2181
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8000/eureka/
+spring:
+  application:
+    name: client-feign

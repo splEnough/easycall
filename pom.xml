@@ -14,8 +14,9 @@
         <module>test</module>
         <module>api</module>
         <module>providertest</module>
-        <module>test2</module>
-        <module>test3</module>
+        <module>eureka-server</module>
+        <module>person-provider</module>
+        <module>person-consmer</module>
     </modules>
     <!--<modules>-->
     <!--</modules>-->
