@@ -16,15 +16,33 @@ public class DefaultExecutorManager implements ExecutorManager {
      * RpcService公用线程池参数
      * ------------------------------------------
      */
+    /**
+     * 核心线程数量
+     */
     private int corePoolSize = 5;
+    /**
+     * 最大线程数量
+     */
     private int maxPoolSize = 5;
+    /**
+     * 空闲保活时间（ms）
+     */
     private long keepAliveTime = 0L;
     /**
      * 有限的工作队列，默认只保存50个工作任务
      */
 //    private BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(50);
+    // 使用马上交付队列，不缓存任务
     private BlockingQueue<Runnable> workQueue = new SynchronousQueue<>(true);
 
+    private class PublicExecutorService extends ThreadPoolExecutor {
+
+        public PublicExecutorService() {
+            super(corePoolSize, maxPoolSize, keepAliveTime
+                    , TimeUnit.MICROSECONDS, workQueue, new DumpHandler());
+        }
+
+    }
     /**
      * -------------------------------------------
      */
@@ -68,14 +86,6 @@ public class DefaultExecutorManager implements ExecutorManager {
                 }
             }
         }
-    }
-
-    private class PublicExecutorService extends ThreadPoolExecutor {
-
-        public PublicExecutorService() {
-            super(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MICROSECONDS, workQueue, new DumpHandler());
-        }
-
     }
 
     private class PrivateExecutorService extends ThreadPoolExecutor {

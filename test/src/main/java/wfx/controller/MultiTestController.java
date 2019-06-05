@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import wfx.service.LongTimeCostService;
 import wfx.service.MultiTestService;
 import wfx.vo.Member;
 
@@ -24,7 +25,21 @@ public class MultiTestController {
     @Autowired
     private MultiTestService multiTestService;
 
+    @Autowired
+    private LongTimeCostService longTimeCostService;
+
+
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    @RequestMapping("/dump")
+    public Object testDumpThread() {
+        for (int i = 0;i < 6;i++) {
+            new Thread(() -> {
+                this.longTimeCostService.handle("echo");
+            }).start();
+        }
+        return true;
+    }
 
     @RequestMapping("/detail")
     public Object detail() throws Exception{

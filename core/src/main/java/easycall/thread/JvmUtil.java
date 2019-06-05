@@ -15,8 +15,6 @@ import java.util.Set;
 
 /**
  * JVM工具类，提供jstack jmap memory等信息的输出
- *
- * @author xuanxiao
  */
 @SuppressWarnings("restriction")
 public class JvmUtil {

@@ -24,6 +24,7 @@ public class ServerTest {
         provider.setServiceName(EchoService.class.getTypeName());
         provider.setRpcServiceObject(new EchoServiceImpl());
         provider.setVersion("1.0");
+
         RPCProvider<LongTimeCostService> handleProvider = new RPCProvider<>();
         handleProvider.setInterfaceName(LongTimeCostService.class.getName());
         handleProvider.setServiceName(LongTimeCostService.class.getTypeName());

@@ -23,7 +23,8 @@ public class EchoController {
                 System.out.println(echoService.echo(msg));
                 TimeUnit.MILLISECONDS.sleep(500);
             } catch (Exception e) {
-                TimeUnit.SECONDS.sleep(2);
+                e.printStackTrace();
+                TimeUnit.SECONDS.sleep(4);
             }
         }
     }

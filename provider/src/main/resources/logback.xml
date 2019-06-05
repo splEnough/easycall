@@ -1,0 +1,12 @@
+<configuration scan="true" scanPeriod="60000" debug="false">
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%p] 哈哈 -[%d] -- [%c] -- %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="stdout" />
+    </root>
+
+</configuration>
