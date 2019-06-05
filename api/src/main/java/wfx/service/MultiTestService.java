@@ -1,8 +1,9 @@
 package wfx.service;
 
-import wfx.vo.Person;
+import wfx.vo.Member;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,30 +13,30 @@ import java.util.Map;
 public interface MultiTestService {
 
     /**
-     * 通过参数构建一个Person对象
+     * 通过参数构建一个Membern对象
      * @param name 姓名
      * @param age 年龄
      * @param salary 工资
      * @param birthday 生日
      */
-    Person buildPerson(String name, Integer age, Double salary, LocalDate birthday);
+    Member buildMember(String name, Integer age, Double salary, LocalDate birthday);
 
     /**
-     * 随机构造Person对象列表List
+     * 随机构造Member对象列表List
      * @param ages 年龄列表
      */
-    List<Person> getPersonList(List<Integer> ages);
+    List<Member> getMemberList(ArrayList<Integer> ages);
 
     /**
-     * 通过key列表随机生成Person对象Map
-     * @param keys 对应person中的age
+     * 通过key列表随机生成Member对象Map
+     * @param keys 对应Member中的age
      */
-    Map<String,Person> getPersonMap(List<String> keys);
+    Map<String,Member> getMemberMap(ArrayList<String> keys);
 
     /**
      * 返回空值
-     * @param perosn
+     * @param member
      */
-    void printPersonMsg(Person perosn);
+    void printMemberMsg(Member member);
 
 }

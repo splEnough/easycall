@@ -34,9 +34,9 @@ import static io.netty.channel.ChannelOption.CONNECT_TIMEOUT_MILLIS;
 public class PooledConnectionFactory extends ConnectionFactoryAdapter {
 
     // 读空闲最大30s，与服务端的读空闲时间保持相同
-    private static final int readerIdleSeconds = 60;
+    private static final int readerIdleSeconds = 30;
     // 写空闲最大25s，保证最多在心跳发送超过5秒没收到回复后会关闭Channel
-    private static final int writerIdleSeconds = 15;
+    private static final int writerIdleSeconds = 5;
     // disabled
     private static final int allIdleSeconds = 0;
 
@@ -103,7 +103,7 @@ public class PooledConnectionFactory extends ConnectionFactoryAdapter {
             ChannelFuture channelFuture;
             try {
                 channelFuture = bootstrap.connect().sync();
-                System.out.println("创建了Channel连接，channelId：" + channelFuture.channel().id().asLongText().substring(0,4));
+//                System.out.println("创建了Channel连接，channelId：" + channelFuture.channel().id().asLongText().substring(0,4));
                 ChannelFuture closeFuture = channelFuture.channel().closeFuture();
                 // 添加Channel关闭的监听器，关闭Channel后从ConnectionManager中移除
                 closeFuture.addListener((future) -> {

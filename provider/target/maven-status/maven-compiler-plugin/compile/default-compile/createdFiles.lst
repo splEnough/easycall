@@ -1,0 +1,9 @@
+wfx\test\ClientTest.class
+wfx\service\LongTimeCostServiceImpl.class
+wfx\service\MultiTestServiceImpl.class
+wfx\test\ServerTest.class
+wfx\test\TestMain.class
+wfx\service\EchoServiceSecondImpl.class
+wfx\service\EchoServiceImpl.class
+wfx\ProviderTest.class
+wfx\cloudcontrolle\MultiTestController.class

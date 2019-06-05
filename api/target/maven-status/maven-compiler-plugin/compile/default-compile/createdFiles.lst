@@ -1,0 +1,5 @@
+wfx\service\LongTimeCostService.class
+wfx\service\MultiTestService.class
+wfx\vo\Member.class
+wfx\service\EchoService.class
+wfx\service\EchoServiceSecond.class

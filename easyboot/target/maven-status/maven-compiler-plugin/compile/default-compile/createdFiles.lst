@@ -1,0 +1,17 @@
+wfx\consumer\ConsumerParserPostProcessor.class
+wfx\consumer\SimpleProcessor.class
+wfx\consumer\ConsumerConfigProperties.class
+wfx\provider\ProviderBeanDefinitionBuilder.class
+wfx\consumer\ConsumerProperties.class
+wfx\consumer\ConsumerBeanDefinitionBuilder.class
+wfx\consumer\ConsumerParserPostProcessor$1.class
+wfx\provider\ProviderConfigAutoConfig.class
+wfx\provider\ProviderConfigProperties.class
+wfx\provider\ProviderServiceBeanGeneratorSelector.class
+wfx\config\RpcServiceBeanGeneratorSelector.class
+wfx\consumer\Consumer.class
+wfx\App.class
+wfx\consumer\ConsumerConfigAutoConfig.class
+wfx\consumer\ConsumerSpringBean.class
+wfx\provider\Provider.class
+wfx\provider\ProviderSpringBean.class

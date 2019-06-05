@@ -28,7 +28,6 @@ public class ConsumerConfigProperties {
     }
 
     public void setConnString(String connString) {
-        System.out.println("设置值");
         this.connString = connString;
     }
 

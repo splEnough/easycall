@@ -11,9 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -63,6 +66,30 @@ public class DefaultZookeeperRegister implements Register {
     }
 
     AtomicBoolean started = new AtomicBoolean();
+
+    private static String hostIp;
+
+    static {
+        try{
+            Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (allNetInterfaces.hasMoreElements()){
+                NetworkInterface netInterface = (NetworkInterface) allNetInterfaces.nextElement();
+                Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
+                while (addresses.hasMoreElements()){
+                    InetAddress ip = (InetAddress) addresses.nextElement();
+                    if (ip != null
+                            && ip instanceof Inet4Address
+                            && !ip.isLoopbackAddress() //loopback地址即本机地址，IPv4的loopback范围是127.0.0.0 ~ 127.255.255.255
+                            && ip.getHostAddress().indexOf(":")==-1){
+                        System.out.println("本机的IP = " + ip.getHostAddress());
+                        hostIp = ip.getHostAddress();
+                    }
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void start() {
@@ -142,10 +169,35 @@ public class DefaultZookeeperRegister implements Register {
         registeredServicesPathSet.clear();
         heartBeatExecutor.shutdown();    }
 
+    private static String getHostIp(){
+        try{
+            Enumeration<NetworkInterface> allNetInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (allNetInterfaces.hasMoreElements()){
+                NetworkInterface netInterface = (NetworkInterface) allNetInterfaces.nextElement();
+                Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
+                while (addresses.hasMoreElements()){
+                    InetAddress ip = (InetAddress) addresses.nextElement();
+                    if (ip != null
+                            && ip instanceof Inet4Address
+                            && !ip.isLoopbackAddress() //loopback地址即本机地址，IPv4的loopback范围是127.0.0.0 ~ 127.255.255.255
+                            && ip.getHostAddress().indexOf(":")==-1){
+                        System.out.println("本机的IP = " + ip.getHostAddress());
+                        return ip.getHostAddress();
+                    }
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private String getCurrentHostIp() throws UnknownHostException {
-        InetAddress address = InetAddress.getLocalHost();
-        String ip = address.getHostAddress();
-        return ip;
+
+//        InetAddress address = InetAddress.getLocalHost();
+//        String ip = address.getHostAddress();
+//        return ip;
+        return hostIp;
     }
 
     class RegistAllServices implements ConnectionStateListener {

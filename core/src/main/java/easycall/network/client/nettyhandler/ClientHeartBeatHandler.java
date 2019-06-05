@@ -8,10 +8,7 @@ import easycall.codec.packet.ResponsePacket;
 import easycall.codec.serializer.SerializeType;
 import easycall.network.client.management.ConnectionManager;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
+import io.netty.channel.*;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
 
@@ -27,6 +24,7 @@ import java.util.concurrent.Executors;
  *
  * @author 翁富鑫 2019/3/3 16:23
  */
+@ChannelHandler.Sharable
 public class ClientHeartBeatHandler extends ChannelDuplexHandler implements Closeable {
 
     /**
@@ -100,6 +98,7 @@ public class ClientHeartBeatHandler extends ChannelDuplexHandler implements Clos
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        System.out.println(Thread.currentThread().getName() + "收到了事件通知");
         if (evt instanceof IdleStateEvent) {
             heartBeatExecutorService.submit(() -> {
                 Channel channel = ctx.channel();

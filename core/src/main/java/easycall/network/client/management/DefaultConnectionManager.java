@@ -32,7 +32,7 @@ public class DefaultConnectionManager implements ConnectionManager {
     /**
      * 最大空闲时间，超过则关闭连接，默认为120秒
      */
-    private static final Integer maxIdleTime = 60;
+    private static final Integer maxIdleTime = 10;
 
     /**
      * 空闲检测器
@@ -85,7 +85,7 @@ public class DefaultConnectionManager implements ConnectionManager {
     @Override
     public Connection getIdleConnectionByIpAndPort(String ip, Integer port) {
         List<Connection> connections = this.getConnectionsByIpAndPort(ip, port);
-        if (connections != null && connections.size() > eachPortMaxConnection) {
+        if (connections != null && connections.size() >= eachPortMaxConnection) {
             // 当前host+port已经建立了eachPortMaxConnection个连接了，不能再创建
             // 返回一个休眠时间最长的
             Connection maxIdleConnection = connections.get(0);

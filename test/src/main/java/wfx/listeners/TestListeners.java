@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author 翁富鑫 2019/4/29 21:56
  */
-@Component
+//@Component
 public class TestListeners implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
