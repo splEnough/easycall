@@ -25,7 +25,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <netty.all.version>4.1.32.Final</netty.all.version>
+        <netty.all.version>4.1.42.Final</netty.all.version>
         <kryo.version>4.0.2</kryo.version>
         <protostuff.version>1.5.9</protostuff.version>
         <spring.version>5.1.5.RELEASE</spring.version>
